@@ -5,6 +5,10 @@ const sequelize = require('./config/database');
 const User = require('./models/User');
 const Event = require('./models/Event');
 const EventSignup = require('./models/EventSignup');
+const eventRoutes = require('./routes/events');
+const eventRoutes = require('./routes/events');
+const userRoutes = require('./routes/users');
+const signupRoutes = require('./routes/signups');
 
 const app = express();
 app.use(cors());
@@ -15,6 +19,11 @@ const PORT = 5000;
 app.get('/', (req, res) => {
   res.send('Server is running!');
 });
+app.use('/api/events', eventRoutes);
+app.use('/api/events', eventRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/signups', signupRoutes);
+
 
 sequelize.authenticate()
   .then(() => {
