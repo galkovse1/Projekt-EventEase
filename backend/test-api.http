@@ -1,0 +1,43 @@
+### Pridobi vse dogodke
+GET http://localhost:5000/api/events
+
+###
+
+### Dodaj uporabnika
+POST http://localhost:5000/api/users
+Content-Type: application/json
+
+{
+  "name": "Gal",
+  "surname": "Kovše",
+  "username": "galk",
+  "email": "gal2@example.com",
+  "profileImage": "",
+  "description": "Testni opis"
+}
+
+###
+
+### Dodaj dogodek
+POST http://localhost:5000/api/events
+Content-Type: application/json
+
+{
+  "title": "EventEase test",
+  "description": "Testni opis dogodka",
+  "dateTime": "2025-06-03T18:00:00",
+  "location": "Ljubljana",
+  "imageUrl": "",
+  "allowSignup": true,
+  "ownerId": "11111111-1111-1111-1111-111111111111"
+}
+
+###
+
+### Prijava na dogodek
+POST http://localhost:5000/api/signups/aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaa1
+Content-Type: application/json
+
+{
+  "userId": "11111111-1111-1111-1111-111111111111"
+}

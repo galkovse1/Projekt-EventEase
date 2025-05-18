@@ -6,7 +6,6 @@ const User = require('./models/User');
 const Event = require('./models/Event');
 const EventSignup = require('./models/EventSignup');
 const eventRoutes = require('./routes/events');
-const eventRoutes = require('./routes/events');
 const userRoutes = require('./routes/users');
 const signupRoutes = require('./routes/signups');
 
