@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const User = require('./User');
 
 const Event = sequelize.define('Event', {
     id: {
@@ -32,11 +31,11 @@ const Event = sequelize.define('Event', {
     reminderSent: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
+    },
+    ownerId: {
+        type: DataTypes.STRING,
+        allowNull: false
     }
 });
-
-// Relacija: vsak dogodek pripada enemu uporabniku
-Event.belongsTo(User, { foreignKey: 'ownerId' });
-User.hasMany(Event, { foreignKey: 'ownerId' });
 
 module.exports = Event;

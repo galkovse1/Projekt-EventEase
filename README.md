@@ -1,5 +1,107 @@
 # Projekt-EventEase
 
+## Namestitev in zagon projekta
+
+### Predpogoji
+- Node.js (najnovejša LTS verzija)
+- MYSql
+- Git
+- VS Code ali podoben IDE
+- Postman ali podobno orodje za testiranje API-jev
+
+### 1. Namestitev MySQL
+1. Med namestitvijo si zapomnite:
+   - Geslo za MySQL uporabnika
+   - Vrata (port) - privzeto 3306
+2. Ustvarite novo bazo podatkov:
+```sql
+CREATE DATABASE event_planner;
+```
+
+### 2. Backend namestitev
+1. Pojdite v backend mapo:
+```bash
+cd backend
+```
+
+2. Namestite odvisnosti:
+```bash
+npm install
+```
+
+3. Ustvarite `.env` datoteko v backend(v korenu mape) mapi z naslednjo vsebino:
+```env
+# Baza podatkov
+DB_NAME=event_planner
+DB_USER=root ---spremni če je drugačen pri tebi
+DB_PASSWORD= --spremni če je drugačen pri tebi
+DB_HOST=127.0.0.1 --spremni če je drugačen pri tebi
+DB_PORT=3306 --spremni če je drugačen pri tebi
+AUTH0_ISSUER_BASE_URL=https://dev-r12pt12nxl2304iz.us.auth0.com
+AUTH0_AUDIENCE=https://dev-r12pt12nxl2304iz.us.auth0.com/api/v2/
+AUTH0_CLIENT_ID=Uzt64YhWzB0XVnYhxjyG31HOJG0rNaNU
+```
+
+4. Zaženite backend:
+```bash
+npx nodemon index.js
+```
+
+### 3. Frontend namestitev
+1. Odprite novo terminal okno in pojdite v frontend mapo:
+```bash
+cd frontend
+```
+
+2. Namestite odvisnosti:
+```bash
+npm install
+```
+
+3. Auth0 konfiguracija je že vključena v repozitoriju v `src/auth/auth0-config.ts` datoteki. Ko naredite `git pull`, boste dobili vse potrebne nastavitve.
+
+4.Spodaj pod 4 točko so vse knjižnice in za backend in za frontend
+
+5. Zaženite frontend:
+```bash
+npm run dev
+```
+
+### 4. Reševanje težav
+1. **Backend ne deluje:**
+   - Preverite, če je MySQL zagnan
+   - Preverite, če so vse spremenljivke v `.env` pravilno nastavljene
+   - Preverite, če so nameščene vse potrebne knjižnice:
+     ```bash
+     # Backend knjižnice
+     npm install express
+     npm install cors
+     npm install dotenv
+     npm install mysql2
+     npm install sequelize
+     npm install express-oauth2-jwt-bearer
+     npm install nodemon --save-dev
+     ```
+
+2. **Frontend ne deluje:**
+   - Preverite, če je backend zagnan
+   - Preverite, če so nameščene vse potrebne knjižnice:
+     ```bash
+     # Frontend knjižnice
+     npm install @auth0/auth0-react
+     npm install axios
+     npm install react-router-dom
+     npm install @types/react-router-dom
+     npm install tailwindcss postcss autoprefixer
+     npm install @vitejs/plugin-react
+     npm install typescript
+     ```
+
+3. **Če imate težave z namestitvijo:**
+   - Izbrišite `node_modules` mapo in `package-lock.json` datoteko
+   - Ponovno zaženite `npm install`
+   - Preverite, če imate pravilno verzijo Node.js (najnovejša LTS)
+
 Tedenski plan razvoja
 
 🟢 Teden 1 (ta teden)
@@ -40,7 +142,7 @@ Tedenski plan razvoja
 ➡️ Cilj: dogodek lahko dodaš, urejaš, brišeš, prijaviš
 
 🔴 Teden 4
--Stran “/profile” s podatki uporabnika
+-Stran "/profile" s podatki uporabnika
 
 -Koledar z označenimi dogodki
 
