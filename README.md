@@ -58,7 +58,17 @@ cd frontend
 npm install
 ```
 
-3. Auth0 konfiguracija je že vključena v repozitoriju v `src/auth/auth0-config.ts` datoteki. Ko naredite `git pull`, boste dobili vse potrebne nastavitve.
+3.Nastavitev Auth0 (.env)
+
+Vsak mora v mapi `frontend` ustvariti datoteko `.env` z naslednjo vsebino:
+
+```
+VITE_AUTH0_DOMAIN=dev-r12pt12nxl2304iz.us.auth0.com
+VITE_AUTH0_CLIENT_ID=Uzt64YhWzB0XVnYhxjyG31HOJG0rNaNU
+VITE_AUTH0_AUDIENCE=https://dev-r12pt12nxl2304iz.us.auth0.com/api/v2/
+```
+
+Datoteka `.env` naj bo dodana v `.gitignore` in naj se NE deli javno ali preko gita.
 
 4.Spodaj pod 4 točko so vse knjižnice in za backend in za frontend
 
