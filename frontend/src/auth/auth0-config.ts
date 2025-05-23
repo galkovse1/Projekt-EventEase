@@ -1,8 +1,8 @@
 export const auth0Config = {
-  domain: 'dev-r12pt12nxl2304iz.us.auth0.com',
-  clientId: 'Uzt64YhWzB0XVnYhxjyG31HOJG0rNaNU',
+  domain: import.meta.env.VITE_AUTH0_DOMAIN,
+  clientId: import.meta.env.VITE_AUTH0_CLIENT_ID,
   authorizationParams: {
     redirect_uri: `${window.location.origin}/profile`,
-    audience: 'https://dev-r12pt12nxl2304iz.us.auth0.com/api/v2/'
+    audience: import.meta.env.VITE_AUTH0_AUDIENCE
   }
 }; 
