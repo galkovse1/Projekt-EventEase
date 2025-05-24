@@ -35,6 +35,10 @@ const Event = sequelize.define('Event', {
     ownerId: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    maxSignups: {
+        type: DataTypes.INTEGER,
+        allowNull: true
     }
 });
 
