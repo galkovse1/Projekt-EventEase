@@ -1,23 +1,50 @@
 const EventSignup = require('../models/EventSignup');
 const Event = require('../models/Event');
+const { Op } = require('sequelize');
 
 const signupToEvent = async (req, res) => {
     const { eventId } = req.params;
-    const { userId } = req.body;
+    const { name, surname, age, userId } = req.body;
 
     const event = await Event.findByPk(eventId);
     if (!event || !event.allowSignup) {
         return res.status(403).json({ error: 'Prijava ni dovoljena' });
     }
 
-    const newSignup = await EventSignup.create({ eventId, userId });
+    // Preveri maxSignups
+    if (event.maxSignups) {
+        const prijavljenih = await EventSignup.count({ where: { eventId } });
+        if (prijavljenih >= event.maxSignups) {
+            return res.status(403).json({ error: 'Doseženo maksimalno število prijav' });
+        }
+    }
+
+    // Prepreči večkratno prijavo istega userja (če je userId podan)
+    if (userId) {
+        const obstaja = await EventSignup.findOne({ where: { eventId, userId } });
+        if (obstaja) {
+            return res.status(409).json({ error: 'Uporabnik je že prijavljen na ta dogodek' });
+        }
+    }
+
+    const newSignup = await EventSignup.create({ eventId, name, surname, age, userId });
     res.status(201).json(newSignup);
 };
 
 const getEventSignups = async (req, res) => {
     const { eventId } = req.params;
-    const signups = await EventSignup.findAll({ where: { eventId } });
+    const signups = await EventSignup.findAll({ where: { eventId }, attributes: ['id', 'name', 'surname', 'age', 'userId'] });
     res.json(signups);
 };
 
-module.exports = { signupToEvent, getEventSignups };
+const cancelSignup = async (req, res) => {
+    const { eventId, userId } = req.params;
+    const prijava = await EventSignup.findOne({ where: { eventId, userId } });
+    if (!prijava) {
+        return res.status(404).json({ error: 'Prijava ni najdena' });
+    }
+    await prijava.destroy();
+    res.status(204).send();
+};
+
+module.exports = { signupToEvent, getEventSignups, cancelSignup };
