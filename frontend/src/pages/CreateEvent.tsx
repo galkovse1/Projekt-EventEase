@@ -11,7 +11,8 @@ const CreateEvent = () => {
         dateTime: '',
         location: '',
         imageUrl: '',
-        allowSignup: false
+        allowSignup: false,
+        maxSignups: ''
     });
     const [error, setError] = useState('');
 
@@ -47,14 +48,14 @@ const CreateEvent = () => {
 
         try {
             const token = await getAccessTokenSilently();
-            const { title, description, dateTime, location, imageUrl, allowSignup } = formData;
+            const { title, description, dateTime, location, imageUrl, allowSignup, maxSignups } = formData;
             const response = await fetch('http://localhost:5000/api/events', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify({ title, description, dateTime, location, imageUrl, allowSignup })
+                body: JSON.stringify({ title, description, dateTime, location, imageUrl, allowSignup, maxSignups: maxSignups ? parseInt(maxSignups) : null })
             });
 
             if (!response.ok) {
@@ -161,6 +162,23 @@ const CreateEvent = () => {
                             Dovoli prijavo na dogodek
                         </label>
                     </div>
+
+                    {formData.allowSignup && (
+                        <div>
+                            <label htmlFor="maxSignups" className="block text-sm font-medium text-gray-700">
+                                Maksimalno število prijav (pusti prazno za neomejeno)
+                            </label>
+                            <input
+                                type="number"
+                                id="maxSignups"
+                                name="maxSignups"
+                                min="1"
+                                value={formData.maxSignups}
+                                onChange={handleChange}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            />
+                        </div>
+                    )}
 
                     <div>
                         <button
