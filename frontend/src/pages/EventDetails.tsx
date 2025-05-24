@@ -16,16 +16,31 @@ interface Event {
         surname?: string;
         picture?: string;
     };
+    allowSignup: boolean;
+    maxSignups?: number;
+}
+
+interface Signup {
+    id: string;
+    name: string;
+    surname: string;
+    age: number;
+    userId?: string;
 }
 
 const EventDetails = () => {
     const { id } = useParams();
     const [event, setEvent] = useState<Event | null>(null);
     const [error, setError] = useState('');
-    const { user, getAccessTokenSilently } = useAuth0();
+    const { user, getAccessTokenSilently, isLoading } = useAuth0();
     const navigate = useNavigate();
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState<Event | null>(null);
+    const [signups, setSignups] = useState<Signup[]>([]);
+    const [showSignupForm, setShowSignupForm] = useState(false);
+    const [signupData, setSignupData] = useState({ name: '', surname: '', age: '' });
+    const [signupError, setSignupError] = useState('');
+    const [signupSuccess, setSignupSuccess] = useState('');
 
     useEffect(() => {
         const fetchEvent = async () => {
@@ -38,13 +53,27 @@ const EventDetails = () => {
                 setError('Napaka pri pridobivanju dogodka');
             }
         };
+        const fetchSignups = async () => {
+            try {
+                const res = await fetch(`http://localhost:5000/api/signups/${id}`);
+                if (!res.ok) throw new Error('Napaka pri pridobivanju prijav');
+                const data = await res.json();
+                setSignups(data);
+            } catch (err) {
+                // ignore for now
+            }
+        };
         fetchEvent();
+        fetchSignups();
     }, [id]);
 
+    if (isLoading) return <div>Nalaganje...</div>;
     if (error) return <div className="text-center text-red-600">{error}</div>;
     if (!event) return <div>Nalaganje...</div>;
 
     const isOwner = user && event.ownerId === user.sub;
+    const canSignup = event.allowSignup && !isOwner && (!event.maxSignups || signups.length < event.maxSignups);
+    const isSignedUp = user && signups.some(s => s.userId === user.sub);
 
     const handleEditClick = () => {
         setEditData(event);
@@ -96,6 +125,77 @@ const EventDetails = () => {
         }
     };
 
+    const handleSignupChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setSignupData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleSignupSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setSignupError('');
+        setSignupSuccess('');
+        if (!signupData.name.trim() || !signupData.surname.trim() || !signupData.age) {
+            setSignupError('Vsa polja so obvezna!');
+            return;
+        }
+        try {
+            const res = await fetch(`http://localhost:5000/api/signups/${event.id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: signupData.name,
+                    surname: signupData.surname,
+                    age: parseInt(signupData.age),
+                    userId: user ? user.sub : null
+                })
+            });
+            if (!res.ok) {
+                const errData = await res.json();
+                setSignupError(errData.error || 'Napaka pri prijavi');
+                return;
+            }
+            setSignupSuccess('Uspešno prijavljen!');
+            setShowSignupForm(false);
+            setSignupData({ name: '', surname: '', age: '' });
+            // Refresh prijav
+            const res2 = await fetch(`http://localhost:5000/api/signups/${event.id}`);
+            setSignups(await res2.json());
+        } catch (err) {
+            setSignupError('Napaka pri prijavi');
+        }
+    };
+
+    const handleCancelSignup = async () => {
+        if (!user) return;
+        setSignupError('');
+        setSignupSuccess('');
+        try {
+            await fetch(`http://localhost:5000/api/signups/${event.id}/${user.sub}`, {
+                method: 'DELETE'
+            });
+            // Refresh prijav
+            const res2 = await fetch(`http://localhost:5000/api/signups/${event.id}`);
+            setSignups(await res2.json());
+            setSignupSuccess('Uspešno odjavljen!');
+        } catch (err) {
+            setSignupError('Napaka pri odjavi');
+        }
+    };
+
+    const handleOwnerRemoveSignup = async (userIdToRemove: string | undefined) => {
+        if (!userIdToRemove) return;
+        try {
+            await fetch(`http://localhost:5000/api/signups/${event.id}/${userIdToRemove}`, {
+                method: 'DELETE'
+            });
+            // Refresh prijav
+            const res2 = await fetch(`http://localhost:5000/api/signups/${event.id}`);
+            setSignups(await res2.json());
+        } catch (err) {
+            setSignupError('Napaka pri odjavi uporabnika');
+        }
+    };
+
     return (
         <div className="w-full min-h-screen bg-gray-100 px-4 py-8 flex justify-center items-start">
             <div className="w-full max-w-xl bg-white shadow rounded-lg p-6">
@@ -135,6 +235,48 @@ const EventDetails = () => {
                                 </span>
                             ) : event.ownerId}
                         </div>
+                        {canSignup && !showSignupForm && !isSignedUp && (
+                            <button onClick={() => setShowSignupForm(true)} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mb-4">Prijavi se na dogodek</button>
+                        )}
+                        {isSignedUp && user && (
+                            <button onClick={handleCancelSignup} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 mb-4">Odjavi se</button>
+                        )}
+                        {showSignupForm && (
+                            <form onSubmit={handleSignupSubmit} className="space-y-2 mb-4">
+                                <input type="text" name="name" value={signupData.name} onChange={handleSignupChange} placeholder="Ime" className="w-full border rounded p-2" />
+                                <input type="text" name="surname" value={signupData.surname} onChange={handleSignupChange} placeholder="Priimek" className="w-full border rounded p-2" />
+                                <input type="number" name="age" value={signupData.age} onChange={handleSignupChange} placeholder="Starost" className="w-full border rounded p-2" />
+                                {signupError && <div className="text-red-600">{signupError}</div>}
+                                {signupSuccess && <div className="text-green-600">{signupSuccess}</div>}
+                                <div className="flex gap-2">
+                                    <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Potrdi prijavo</button>
+                                    <button type="button" onClick={() => setShowSignupForm(false)} className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">Prekliči</button>
+                                </div>
+                            </form>
+                        )}
+                        {event.allowSignup && (
+                            <div className="mb-4 text-gray-700">Število prijavljenih: {signups.length}{event.maxSignups ? ` / ${event.maxSignups}` : ''}</div>
+                        )}
+                        {isOwner && event.allowSignup && (
+                            <div className="mb-4">
+                                <h3 className="font-semibold mb-2 text-gray-700">Prijavljeni:</h3>
+                                <ul className="list-disc pl-5">
+                                    {signups.map(s => (
+                                        <li key={s.id} className="text-gray-700 flex items-center justify-between">
+                                            <span>{s.name} {s.surname} ({s.age} let)</span>
+                                            <button
+                                                onClick={() => handleOwnerRemoveSignup(s.userId)}
+                                                className="ml-2 text-red-600 hover:underline text-sm"
+                                                disabled={user && user.sub === s.userId}
+                                            >
+                                                Odjavi
+                                            </button>
+                                        </li>
+                                    ))}
+                                    {signups.length === 0 && <li className="text-gray-700">Nihče še ni prijavljen.</li>}
+                                </ul>
+                            </div>
+                        )}
                     </>
                 )}
             </div>
