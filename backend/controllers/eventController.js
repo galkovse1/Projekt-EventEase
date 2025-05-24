@@ -32,7 +32,7 @@ const createEvent = async (req, res) => {
         picture: picture || ''
       });
     }
-    const { title, description, dateTime, location, imageUrl, allowSignup } = req.body;
+    const { title, description, dateTime, location, imageUrl, allowSignup, maxSignups } = req.body;
     const newEvent = await Event.create({
       title,
       description,
@@ -40,6 +40,7 @@ const createEvent = async (req, res) => {
       location,
       imageUrl,
       allowSignup,
+      maxSignups,
       ownerId: auth0Id
     });
     res.status(201).json(newEvent);
@@ -55,14 +56,15 @@ const updateEvent = async (req, res) => {
     const event = await Event.findByPk(req.params.id);
     if (!event) return res.status(404).json({ error: 'Dogodek ne obstaja' });
     if (event.ownerId !== auth0Id) return res.status(403).json({ error: 'Nimate dovoljenja za urejanje tega dogodka' });
-    const { title, description, dateTime, location, imageUrl, allowSignup } = req.body;
+    const { title, description, dateTime, location, imageUrl, allowSignup, maxSignups } = req.body;
     await event.update({
       title,
       description,
       dateTime,
       location,
       imageUrl,
-      allowSignup
+      allowSignup,
+      maxSignups
     });
     res.json(event);
   } catch (err) {
