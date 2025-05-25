@@ -235,13 +235,13 @@ const EventDetails = () => {
                                 </span>
                             ) : event.ownerId}
                         </div>
-                        {canSignup && !showSignupForm && !isSignedUp && (
+                        {user && canSignup && !showSignupForm && !isSignedUp && (
                             <button onClick={() => setShowSignupForm(true)} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mb-4">Prijavi se na dogodek</button>
                         )}
-                        {isSignedUp && user && (
+                        {user && isSignedUp && (
                             <button onClick={handleCancelSignup} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 mb-4">Odjavi se</button>
                         )}
-                        {showSignupForm && (
+                        {user && showSignupForm && (
                             <form onSubmit={handleSignupSubmit} className="space-y-2 mb-4">
                                 <input type="text" name="name" value={signupData.name} onChange={handleSignupChange} placeholder="Ime" className="w-full border rounded p-2" />
                                 <input type="text" name="surname" value={signupData.surname} onChange={handleSignupChange} placeholder="Priimek" className="w-full border rounded p-2" />
