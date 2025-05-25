@@ -112,67 +112,78 @@ npm run dev
    - Ponovno zaženite `npm install`
    - Preverite, če imate pravilno verzijo Node.js (najnovejša LTS)
 
-Tedenski plan razvoja
 
-🟢 Teden 1 (ta teden)
--Inicializacija backenda (Node.js + Express)
 
--Sequelize setup + povezava z PostgreSQL
 
--Modeli: User, Event, Signup
+## Trenutne funkcionalnosti projekta
 
--Testni API-ji (GET /events, POST /events)
+### 0. Omejen dostop za neprijavljene uporabnike
+- Če uporabnik **ni prijavljen**, lahko **samo gleda dogodke**.
+- Ne more ustvarjati dogodkov, urejati dogodkov ali se prijavljati na dogodke.
+- Če neprijavljen uporabnik poskusi dostopati do teh funkcij, je preusmerjen na prijavo.
 
--Lokalna baza + testni dogodki
+### 1. Prijava prek Auth0
+- Uporabnik se lahko prijavi izključno prek Auth0.
+- Sistem pozna identiteto uporabnika na podlagi njegovega Auth0 ID-ja.
 
-➡️ Cilj: delujoča povezava z bazo + osnovni API za dogodke
+### 2. Kreiranje dogodkov (če si prijavljen)
+- Prijavljen uporabnik lahko ustvari nov dogodek.
+- Dogodek se shrani v bazo skupaj z `ownerId` (Auth0 ID ustvarjalca).
 
-🔵 Teden 2
--Inicializacija frontenda (React + TS)
+### 3. Prikaz ustvarjenih dogodkov v koledarju na profilu
+- Uporabniku se na njegovem **profilu prikaže koledar** z dogodki, ki jih je sam ustvaril.
 
--Integracija Auth0
+### 4. Urejanje profila
+- Uporabnik lahko ureja svoj profil.
 
--Prikaz dogodkov (GET /events)
+### 5. Prijava/Odjava na dogodek
+- Vsak uporabnik se lahko **prijavi** ali **odjavi** na dogodek.
 
--Dodajanje dogodka (POST)
+### 6. Nastavitve dogodka s strani ustvarjalca
+- Ustvarjalec dogodka lahko določi:
+  - Ali so prijave dovoljene ali ne.
+  - Maksimalno število prijavljenih uporabnikov.
 
--Validacija (datum ne sme biti v preteklosti)
+### 7. Upravljanje s prijavljenimi
+- Ustvarjalec dogodka lahko **briše prijavljene uporabnike** s svojega dogodka.
 
-➡️ Cilj: osnovni frontend z Auth0 + prikaz in dodajanje dogodkov
+### 8. Urejanje in brisanje dogodka
+- Ustvarjalec lahko **ureja** ali **izbriše** svoj dogodek.
+- Drugi uporabniki lahko dogodek **samo vidijo**.
 
-🟠 Teden 3
--Urejanje in brisanje dogodkov (samo za lastnika)
 
--Prikaz dogodka po ID-ju
 
--Cloudinary upload za slike
 
--Prijava na dogodek (če dovoljena)
+## Načrtovane funkcionalnosti in izboljšave(kaj še pride)
 
-➡️ Cilj: dogodek lahko dodaš, urejaš, brišeš, prijaviš
+- **Javni ali zasebni dogodki**  
+  Ustvarjalec bo lahko izbral, ali je dogodek javen (viden vsem) ali zaseben (viden le povabljenim).
 
-🔴 Teden 4
--Stran "/profile" s podatki uporabnika
+- **Nalaganje slik (Cloudinary)**  
+  Uporabniki bodo lahko naložili profilne slike in slike za dogodke preko storitve Cloudinary.
 
--Koledar z označenimi dogodki
+- **E-mail opomniki**  
+  Uporabniki bodo prejeli opomnike po e-pošti za bližajoče se dogodke.
 
--Klik na datum → skok na dogodek
+- **Komentarji in ocenjevanje dogodkov**  
+  Udeleženci bodo lahko komentirali in ocenjevali dogodke.
 
--Dodajanje opisa profila + profilne slike
+- **Filtriranje dogodkov**  
+  Dodana bo možnost filtriranja dogodkov po datumu, tipu, ustvarjalcu ipd.
 
-➡️ Cilj: delujoč profil z integriranim koledarjem
+- **Klik na datum → skok na dogodek**  
+  V koledarju bo omogočen klik na datum, ki bo uporabnika preusmeril na podrobnosti dogodka.
 
-🟣 Teden 5
--E-mail opomniki 1 dan prej (node-cron + nodemailer)
+- **Izboljšan uporabniški vmesnik profila**  
+  Vizualna prenova in več možnosti za urejanje uporabniškega profila.
 
--Backend končna validacija in zaščita (Auth0 JWT)
+- **Splošna vizualna prenova (frontend)**  
+  Celoten vmesnik bo grafično izboljšan z boljšim UX/UI dizajnom.
 
--Deploy backenda (Render/Railway)
+- **Deploy backend aplikacije**  
+  Načrtovana objava backend strežnika preko Render ali Railway.
 
--Deploy frontenda (Vercel)
+- **Deploy frontend aplikacije**  
+  Načrtovana objava React aplikacije preko Vercel.
 
--Test na pravi povezavi
 
-➡️ Cilj: aplikacija opozarja prijavljene uporabnike in delujoča javna aplikacija s funkcijami
-
---Končna predstavitev (PowerPoint + demo)
