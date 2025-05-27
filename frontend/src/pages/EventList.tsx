@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth0 } from '@auth0/auth0-react';
+//import { useAuth0 } from '@auth0/auth0-react';
 
 interface Event {
     id: string;
@@ -19,7 +19,7 @@ interface Event {
 
 const EventList = () => {
     const [events, setEvents] = useState<Event[]>([]);
-    const { getAccessTokenSilently } = useAuth0();
+    //const { getAccessTokenSilently } = useAuth0();
 
     useEffect(() => {
         const fetchEvents = async () => {
