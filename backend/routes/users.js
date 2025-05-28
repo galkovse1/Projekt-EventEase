@@ -2,15 +2,41 @@ const express = require('express');
 const router = express.Router();
 const checkJwt = require('../middleware/auth');
 const User = require('../models/User');
+const { Op } = require('sequelize');
 
-// All routes require authentication
+// 🔎 Iskanje uporabnikov po imenu ali priimku – BREZ AVTENTIKACIJE
+router.get('/search', async (req, res) => {
+  const query = req.query.query;
+
+  if (!query) {
+    return res.status(400).json({ message: 'Manjka iskalni niz.' });
+  }
+
+  try {
+    const users = await User.findAll({
+      where: {
+        [Op.or]: [
+          { name: { [Op.like]: `%${query}%` } },
+          { surname: { [Op.like]: `%${query}%` } }
+        ]
+      },
+      attributes: ['auth0Id', 'name', 'surname', 'email', 'picture']
+    });
+
+    res.json(users);
+  } catch (error) {
+    console.error('Napaka pri iskanju:', error);
+    res.status(500).json({ message: 'Napaka pri iskanju uporabnikov.' });
+  }
+});
+
+// ✅ Vsi spodnji route-i zahtevajo prijavo
 router.use(checkJwt);
 
-// Pridobi svoj profil
+// 🔐 Pridobi svoj profil
 router.get('/profile', async (req, res) => {
   let user = await User.findByPk(req.auth.payload.sub);
   if (!user) {
-    // Ustvari uporabnika z emailom iz Auth0, ostalo prazno
     user = await User.create({
       auth0Id: req.auth.payload.sub,
       email: req.auth.payload.email || '',
@@ -26,10 +52,11 @@ router.get('/profile', async (req, res) => {
   res.json(user);
 });
 
-// Uredi svoj profil
+// ✏️ Uredi svoj profil
 router.patch('/profile', async (req, res) => {
   const user = await User.findByPk(req.auth.payload.sub);
   if (!user) return res.status(404).json({ error: 'Uporabnik ne obstaja' });
+
   const { name, surname, picture, description } = req.body;
   if (name !== undefined) user.name = name;
   if (surname !== undefined) user.surname = surname;
@@ -39,9 +66,11 @@ router.patch('/profile', async (req, res) => {
   res.json(user);
 });
 
-// Pridobi javni profil po ID
+// 🌐 Pridobi javni profil po ID
 router.get('/:id', async (req, res) => {
-  const user = await User.findByPk(req.params.id, { attributes: ['auth0Id', 'name', 'surname', 'picture', 'description'] });
+  const user = await User.findByPk(req.params.id, {
+    attributes: ['auth0Id', 'name', 'surname', 'picture', 'description']
+  });
   if (!user) return res.status(404).json({ error: 'Uporabnik ne obstaja' });
   res.json(user);
 });
