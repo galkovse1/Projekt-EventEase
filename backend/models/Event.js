@@ -39,6 +39,11 @@ const Event = sequelize.define('Event', {
     maxSignups: {
         type: DataTypes.INTEGER,
         allowNull: true
+    },
+    visibility: {
+        type: DataTypes.ENUM('private', 'public', 'selected'),
+        allowNull: false,
+        defaultValue: 'private'
     }
 });
 
