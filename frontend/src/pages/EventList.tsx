@@ -24,16 +24,21 @@ const EventList = () => {
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/events');
+                const token = await getAccessTokenSilently();
+                const response = await fetch('http://localhost:5000/api/events/visible', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
                 const data = await response.json();
                 setEvents(data);
             } catch (error) {
-                console.error('Error fetching events:', error);
+                console.error('Napaka pri pridobivanju dogodkov:', error);
             }
         };
 
         fetchEvents();
-    }, []);
+    }, [getAccessTokenSilently]);
 
     return (
         <div className="w-full min-h-screen bg-gray-100 px-4 py-8">
@@ -54,12 +59,23 @@ const EventList = () => {
                             <div className="text-sm text-gray-500 mb-4">
                                 <p>Datum: {new Date(event.dateTime).toLocaleString()}</p>
                                 <p>Lokacija: {event.location}</p>
-                                <p>Organizator: {event.User ? (
-                                    <span className="flex items-center gap-2">
-                    {event.User.picture && <img src={event.User.picture} alt={event.User.name} className="w-6 h-6 rounded-full inline" />}
-                                        {event.User.name} {event.User.surname || ''}
-                  </span>
-                                ) : event.ownerId}</p>
+                                <p>
+                                    Organizator:{' '}
+                                    {event.User ? (
+                                        <span className="flex items-center gap-2">
+                      {event.User.picture && (
+                          <img
+                              src={event.User.picture}
+                              alt={event.User.name}
+                              className="w-6 h-6 rounded-full inline"
+                          />
+                      )}
+                                            {event.User.name} {event.User.surname || ''}
+                    </span>
+                                    ) : (
+                                        event.ownerId
+                                    )}
+                                </p>
                             </div>
                             <Link
                                 to={`/events/${event.id}`}
