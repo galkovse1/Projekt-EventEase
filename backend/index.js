@@ -26,7 +26,7 @@ app.use('/api/signups', signupRoutes);
 sequelize.authenticate()
   .then(() => {
     console.log('✅ Povezava z bazo uspešna');
-      return sequelize.sync({ alter: true }); // <-- Dodano za posodobitev struktur
+    return sequelize.sync();// <-- Dodano za posodobitev struktur
   })
   .then(() => {
     app.listen(PORT, () => {
