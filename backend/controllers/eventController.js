@@ -2,6 +2,7 @@ const { Op, Sequelize } = require('sequelize');
 const Event = require('../models/Event');
 const User = require('../models/User');
 const EventVisibility = require('../models/EventVisibility');
+const { sendEventNotification } = require('../utils/emailService');
 
 const getAllEvents = async (req, res) => {
   const events = await Event.findAll({
@@ -23,15 +24,16 @@ const createEvent = async (req, res) => {
   try {
     const auth0Id = req.auth.payload.sub;
     const { name, email, picture } = req.auth.payload;
-    console.log('Auth0 payload:', req.auth.payload);
 
+    // Poišči ali ustvari uporabnika
     let user = await User.findByPk(auth0Id);
     if (!user) {
       user = await User.create({
         auth0Id,
         name: name || '',
         email: email || '',
-        picture: picture || ''
+        picture: picture || '',
+        wantsNotifications: false // privzeto
       });
     }
 
@@ -47,6 +49,7 @@ const createEvent = async (req, res) => {
       visibleTo = []
     } = req.body;
 
+    // Ustvari dogodek
     const newEvent = await Event.create({
       title,
       description,
@@ -59,6 +62,7 @@ const createEvent = async (req, res) => {
       ownerId: auth0Id
     });
 
+    // Če je vidnost izbrana, shrani, komu je dogodek viden
     if (visibility === 'selected' && Array.isArray(visibleTo)) {
       const records = visibleTo.map(userId => ({
         EventId: newEvent.id,
@@ -67,9 +71,22 @@ const createEvent = async (req, res) => {
       await EventVisibility.bulkCreate(records);
     }
 
+    // ✅ Pošlji email, če uporabnik želi obvestila
+    if (user.wantsNotifications && user.email) {
+      console.log(`📧 Pošiljam email na ${user.email} ...`);
+      try {
+        await sendEventNotification(user.email, newEvent);
+        console.log(`✅ Email uspešno poslan.`);
+      } catch (emailErr) {
+        console.error(`❌ Napaka pri pošiljanju emaila:`, emailErr);
+      }
+    } else {
+      console.log(`ℹ️ Uporabnik ne želi prejemati obvestil ali nima e-pošte.`);
+    }
+
     res.status(201).json(newEvent);
   } catch (err) {
-    console.error('Napaka pri ustvarjanju dogodka:', err);
+    console.error('❌ Napaka pri ustvarjanju dogodka:', err);
     res.status(500).json({ error: 'Napaka pri ustvarjanju dogodka' });
   }
 };
