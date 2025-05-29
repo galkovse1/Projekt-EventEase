@@ -11,6 +11,7 @@ interface UserProfile {
     email: string;
     picture?: string;
     description?: string;
+    wantsNotifications?: boolean;
 }
 
 interface EventData {
@@ -23,7 +24,7 @@ const Profile = () => {
     const { getAccessTokenSilently, isAuthenticated, isLoading } = useAuth0();
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [edit, setEdit] = useState(false);
-    const [form, setForm] = useState({ name: '', surname: '', description: '', picture: '' });
+    const [form, setForm] = useState({ name: '', surname: '', description: '', picture: '', wantsNotifications: false });
     const [error, setError] = useState('');
     const [events, setEvents] = useState<EventData[]>([]);
 
@@ -43,7 +44,8 @@ const Profile = () => {
                     name: data.name || '',
                     surname: data.surname || '',
                     description: data.description || '',
-                    picture: data.picture || ''
+                    picture: data.picture || '',
+                    wantsNotifications: data.wantsNotifications || false
                 });
             } catch {
                 setError('Napaka pri pridobivanju profila');
@@ -118,11 +120,23 @@ const Profile = () => {
                                 <input type="text" placeholder="Priimek" value={form.surname} onChange={e => setForm(f => ({ ...f, surname: e.target.value }))} className="border p-2 rounded w-full max-w-xs" />
                                 <input type="url" placeholder="URL profilne slike" value={form.picture} onChange={e => setForm(f => ({ ...f, picture: e.target.value }))} className="border p-2 rounded w-full max-w-xs" />
                                 <textarea placeholder="Opis" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} className="border p-2 rounded w-full max-w-xs mt-2" />
+                                <label className="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        checked={form.wantsNotifications}
+                                        onChange={e => setForm(f => ({ ...f, wantsNotifications: e.target.checked }))}
+                                        className="form-checkbox"
+                                    />
+                                    Želim prejemati obvestila o novih dogodkih
+                                </label>
                                 <button onClick={handleSave} className="bg-blue-500 text-white px-4 py-2 rounded mt-2">Shrani</button>
                             </div>
                         ) : (
                             <>
                                 <p className="mt-4 text-gray-700 text-center">{profile.description || <span className="text-gray-400">[Dodaj opis]</span>}</p>
+                                <p className="text-sm text-center text-gray-600">
+                                    Obvestila: {profile.wantsNotifications ? 'Vključena' : 'Izključena'}
+                                </p>
                                 <button onClick={() => setEdit(true)} className="bg-blue-500 text-white px-4 py-2 rounded mt-2">Uredi profil</button>
                             </>
                         )}
