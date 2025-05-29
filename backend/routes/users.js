@@ -36,6 +36,7 @@ router.use(checkJwt);
 // 🔐 Pridobi svoj profil
 router.get('/profile', async (req, res) => {
   let user = await User.findByPk(req.auth.payload.sub);
+
   if (!user) {
     user = await User.create({
       auth0Id: req.auth.payload.sub,
@@ -43,12 +44,14 @@ router.get('/profile', async (req, res) => {
       name: '',
       surname: '',
       picture: req.auth.payload.picture || '',
-      description: ''
+      description: '',
+      wantsNotifications: false
     });
   } else if (!user.email && req.auth.payload.email) {
     user.email = req.auth.payload.email;
     await user.save();
   }
+
   res.json(user);
 });
 
@@ -57,11 +60,14 @@ router.patch('/profile', async (req, res) => {
   const user = await User.findByPk(req.auth.payload.sub);
   if (!user) return res.status(404).json({ error: 'Uporabnik ne obstaja' });
 
-  const { name, surname, picture, description } = req.body;
+  const { name, surname, picture, description, wantsNotifications } = req.body;
+
   if (name !== undefined) user.name = name;
   if (surname !== undefined) user.surname = surname;
   if (picture !== undefined) user.picture = picture;
   if (description !== undefined) user.description = description;
+  if (wantsNotifications !== undefined) user.wantsNotifications = wantsNotifications;
+
   await user.save();
   res.json(user);
 });
