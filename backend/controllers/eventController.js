@@ -115,21 +115,65 @@ const deleteEvent = async (req, res) => {
 
 const getVisibleEvents = async (req, res) => {
   try {
-    const auth0Id = req.auth.payload.sub;
+    const auth0Id = req.auth?.payload?.sub || null;
+    const { search = '', location = '', date, organizer = '', onlyMine = false } = req.query;
+
+    const filters = [];
+
+    if (search) {
+      filters.push({
+        [Op.or]: [
+          { title: { [Op.like]: `%${search}%` } },
+          { description: { [Op.like]: `%${search}%` } }
+        ]
+      });
+    }
+
+    if (location) {
+      filters.push({ location: { [Op.like]: `%${location}%` } });
+    }
+
+    if (date) {
+      const start = new Date(date);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(date);
+      end.setHours(23, 59, 59, 999);
+      filters.push({ dateTime: { [Op.between]: [start, end] } });
+    }
+
+    if (organizer) {
+      filters.push(Sequelize.literal(`
+        EXISTS (
+          SELECT 1 FROM Users
+          WHERE Users.auth0Id = Event.ownerId
+          AND (Users.name LIKE '%${organizer}%' OR Users.surname LIKE '%${organizer}%')
+        )
+      `));
+    }
+
+    if (onlyMine === 'true' && auth0Id) {
+      filters.push({ ownerId: auth0Id });
+    }
+
+    const visibilityCondition = auth0Id
+        ? {
+          [Op.or]: [
+            { visibility: 'public' },
+            { ownerId: auth0Id },
+            Sequelize.literal(`
+              EXISTS (
+                SELECT 1 FROM EventVisibilities
+                WHERE EventVisibilities.EventId = Event.id
+                AND EventVisibilities.UserId = '${auth0Id}'
+              )
+            `)
+          ]
+        }
+        : { visibility: 'public' };
 
     const events = await Event.findAll({
       where: {
-        [Op.or]: [
-          { visibility: 'public' },
-          { ownerId: auth0Id },
-          Sequelize.literal(`
-            EXISTS (
-              SELECT 1 FROM EventVisibilities ev
-              WHERE ev.EventId = Event.id
-              AND ev.UserId = '${auth0Id}'
-            )
-          `)
-        ]
+        [Op.and]: [visibilityCondition, ...filters]
       },
       include: [
         {
@@ -143,10 +187,11 @@ const getVisibleEvents = async (req, res) => {
 
     res.json(events);
   } catch (err) {
-    console.error('Napaka pri pridobivanju vidnih dogodkov:', err);
+    console.error('Napaka pri pridobivanju dogodkov:', err);
     res.status(500).json({ error: 'Napaka pri pridobivanju dogodkov' });
   }
 };
+
 
 module.exports = {
   getAllEvents,
