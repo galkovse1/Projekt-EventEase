@@ -25,7 +25,12 @@ const User = sequelize.define('User', {
   description: {
     type: DataTypes.TEXT,
     allowNull: true
+  },
+  wantsNotifications: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
   }
 });
 
-module.exports = User; 
+module.exports = User;
