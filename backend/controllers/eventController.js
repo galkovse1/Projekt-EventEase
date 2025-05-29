@@ -81,7 +81,7 @@ const updateEvent = async (req, res) => {
     if (!event) return res.status(404).json({ error: 'Dogodek ne obstaja' });
     if (event.ownerId !== auth0Id) return res.status(403).json({ error: 'Nimate dovoljenja za urejanje tega dogodka' });
 
-    const { title, description, dateTime, location, imageUrl, allowSignup, maxSignups } = req.body;
+    const { title, description, dateTime, location, imageUrl, allowSignup, maxSignups, visibility } = req.body;
 
     await event.update({
       title,
@@ -90,7 +90,8 @@ const updateEvent = async (req, res) => {
       location,
       imageUrl,
       allowSignup,
-      maxSignups
+      maxSignups,
+      visibility
     });
 
     res.json(event);

@@ -11,6 +11,7 @@ interface Event {
     location: string;
     imageUrl: string;
     ownerId: string;
+    visibility: 'public' | 'private' | 'selected';
     User?: {
         name: string;
         surname?: string;
@@ -196,6 +197,7 @@ const EventDetails = () => {
         }
     };
 
+
     return (
         <div className="w-full min-h-screen bg-gray-100 px-4 py-8 flex justify-center items-start">
             <div className="w-full max-w-xl bg-white shadow rounded-lg p-6">
@@ -210,14 +212,74 @@ const EventDetails = () => {
                 )}
                 {isEditing ? (
                     <form onSubmit={handleEditSubmit} className="space-y-4">
-                        <input type="text" name="title" value={editData?.title || ''} onChange={handleEditChange} className="w-full border rounded p-2" placeholder="Naslov" />
-                        <textarea name="description" value={editData?.description || ''} onChange={handleEditChange} className="w-full border rounded p-2" placeholder="Opis" />
-                        <input type="datetime-local" name="dateTime" value={editData?.dateTime ? editData.dateTime.slice(0,16) : ''} onChange={handleEditChange} className="w-full border rounded p-2" />
-                        <input type="text" name="location" value={editData?.location || ''} onChange={handleEditChange} className="w-full border rounded p-2" placeholder="Lokacija" />
-                        <input type="url" name="imageUrl" value={editData?.imageUrl || ''} onChange={handleEditChange} className="w-full border rounded p-2" placeholder="URL slike" />
+                        <input
+                            type="text"
+                            name="title"
+                            value={editData?.title || ''}
+                            onChange={handleEditChange}
+                            className="w-full border rounded p-2"
+                            placeholder="Naslov"
+                        />
+                        <textarea
+                            name="description"
+                            value={editData?.description || ''}
+                            onChange={handleEditChange}
+                            className="w-full border rounded p-2"
+                            placeholder="Opis"
+                        />
+                        <input
+                            type="datetime-local"
+                            name="dateTime"
+                            value={editData?.dateTime ? editData.dateTime.slice(0, 16) : ''}
+                            onChange={handleEditChange}
+                            className="w-full border rounded p-2"
+                        />
+                        <input
+                            type="text"
+                            name="location"
+                            value={editData?.location || ''}
+                            onChange={handleEditChange}
+                            className="w-full border rounded p-2"
+                            placeholder="Lokacija"
+                        />
+                        <input
+                            type="url"
+                            name="imageUrl"
+                            value={editData?.imageUrl || ''}
+                            onChange={handleEditChange}
+                            className="w-full border rounded p-2"
+                            placeholder="URL slike"
+                        />
+
+                        {/* 🔽 Novo polje za spremembo vidnosti */}
+                        <div>
+                            <label className="block font-semibold mb-1">Vidnost dogodka</label>
+                            <select
+                                name="visibility"
+                                className="w-full border p-2 rounded"
+                                value={editData?.visibility || 'public'}
+                                onChange={handleEditChange}
+                            >
+                                <option value="public">Javen</option>
+                                <option value="private">Zaseben</option>
+                                <option value="selected">Izbrani uporabniki</option>
+                            </select>
+                        </div>
+
                         <div className="flex gap-2">
-                            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Shrani</button>
-                            <button type="button" onClick={() => setIsEditing(false)} className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">Prekliči</button>
+                            <button
+                                type="submit"
+                                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                            >
+                                Shrani
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setIsEditing(false)}
+                                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+                            >
+                                Prekliči
+                            </button>
                         </div>
                     </form>
                 ) : (
@@ -226,6 +288,12 @@ const EventDetails = () => {
                         <p className="mb-2">{event.description}</p>
                         <p className="text-gray-600 mb-2">Datum: {new Date(event.dateTime).toLocaleString()}</p>
                         <p className="text-gray-600 mb-2">Lokacija: {event.location}</p>
+                        <p><strong>Vidnost:</strong> {
+                            event.visibility === 'public' ? 'Javen' :
+                                event.visibility === 'private' ? 'Zaseben' :
+                                    event.visibility === 'selected' ? 'Izbrani uporabniki' : 'Ni določeno'
+                        }</p>
+
                         <div className="flex items-center gap-2 mb-2">
                             <span className="font-semibold">Organizator:</span>
                             {event.User ? (

@@ -189,9 +189,9 @@ const CreateEvent = () => {
                             <div className="mt-2">
                                 {selectedUsers.map(user => (
                                     <span key={user.auth0Id} className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm mr-2 mb-2">
-                    {user.name} {user.surname}
+                                        {user.name} {user.surname}
                                         <button type="button" className="ml-1 text-red-500" onClick={() => removeUser(user.auth0Id)}>×</button>
-                  </span>
+                                    </span>
                                 ))}
                             </div>
                         </div>
