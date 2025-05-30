@@ -150,29 +150,26 @@ npm run dev
 ### 8. Urejanje in brisanje dogodka
 - Ustvarjalec lahko **ureja** ali **izbriše** svoj dogodek.
 - Drugi uporabniki lahko dogodek **samo vidijo**.
+  
+### 9. Javni ali zasebni dogodki
+ - Ustvarjalec bo lahko izbral, ali je dogodek javen (viden vsem) ali zaseben (viden le povabljenim).
+  
+### 10. E-mail opomniki  
+ - Uporabniki bodo prejeli opomnike po e-pošti za bližajoče se dogodke.
 
+### 11.Filtriranje dogodkov 
+ - Dodana bo možnost filtriranja dogodkov po datumu, tipu, ustvarjalcu ipd.
 
-
+### 12.Klik na datum → skok na dogodek 
+  - V koledarju bo omogočen klik na datum, ki bo uporabnika preusmeril na podrobnosti dogodka.
 
 ## Načrtovane funkcionalnosti in izboljšave(kaj še pride)
 
-- **Javni ali zasebni dogodki**  
-  Ustvarjalec bo lahko izbral, ali je dogodek javen (viden vsem) ali zaseben (viden le povabljenim).
 
 - **Nalaganje slik (Cloudinary)**  
   Uporabniki bodo lahko naložili profilne slike in slike za dogodke preko storitve Cloudinary.
-
-- **E-mail opomniki**  
-  Uporabniki bodo prejeli opomnike po e-pošti za bližajoče se dogodke.
-
-- **Komentarji in ocenjevanje dogodkov**  
-  Udeleženci bodo lahko komentirali in ocenjevali dogodke.
-
-- **Filtriranje dogodkov**  
-  Dodana bo možnost filtriranja dogodkov po datumu, tipu, ustvarjalcu ipd.
-
-- **Klik na datum → skok na dogodek**  
-  V koledarju bo omogočen klik na datum, ki bo uporabnika preusmeril na podrobnosti dogodka.
+  
+- **Dodana funkcionalnost polla za odločabje datuma(če kreator zbere to opcijo)**  
 
 - **Izboljšan uporabniški vmesnik profila**  
   Vizualna prenova in več možnosti za urejanje uporabniškega profila.
