@@ -1,7 +1,6 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { useNavigate } from 'react-router-dom';
 
 interface Event {
     id: string;
@@ -12,13 +11,19 @@ interface Event {
     imageUrl: string;
     ownerId: string;
     visibility: 'public' | 'private' | 'selected';
+    allowSignup: boolean;
+    maxSignups?: number;
     User?: {
         name: string;
         surname?: string;
         picture?: string;
     };
-    allowSignup: boolean;
-    maxSignups?: number;
+    dateOptions?: {
+        id: string;
+        dateOption: string;
+        isFinal: boolean;
+        votes: { userId: string }[];
+    }[];
 }
 
 interface Signup {
@@ -31,60 +36,62 @@ interface Signup {
 
 const EventDetails = () => {
     const { id } = useParams();
-    const [event, setEvent] = useState<Event | null>(null);
-    const [error, setError] = useState('');
-    const { user, getAccessTokenSilently, isLoading } = useAuth0();
     const navigate = useNavigate();
-    const [isEditing, setIsEditing] = useState(false);
-    const [editData, setEditData] = useState<Event | null>(null);
+    const { user, getAccessTokenSilently, isLoading } = useAuth0();
+
+    const [event, setEvent] = useState<Event | null>(null);
+    const [dateOptions, setDateOptions] = useState<Event["dateOptions"]>([]);
     const [signups, setSignups] = useState<Signup[]>([]);
-    const [showSignupForm, setShowSignupForm] = useState(false);
-    const [signupData, setSignupData] = useState({ name: '', surname: '', age: '' });
+    const [error, setError] = useState('');
     const [signupError, setSignupError] = useState('');
     const [signupSuccess, setSignupSuccess] = useState('');
+    const [showSignupForm, setShowSignupForm] = useState(false);
+    const [signupData, setSignupData] = useState({ name: '', surname: '', age: '' });
+
+    const [isEditing, setIsEditing] = useState(false);
+    const [editData, setEditData] = useState<Event | null>(null);
 
     useEffect(() => {
-        const fetchEvent = async () => {
-            try {
-                const res = await fetch(`http://localhost:5000/api/events/${id}`);
-                if (!res.ok) throw new Error('Napaka pri pridobivanju dogodka');
-                const data = await res.json();
-                setEvent(data);
-            } catch (err) {
-                setError('Napaka pri pridobivanju dogodka');
-            }
-        };
-        const fetchSignups = async () => {
-            try {
-                const res = await fetch(`http://localhost:5000/api/signups/${id}`);
-                if (!res.ok) throw new Error('Napaka pri pridobivanju prijav');
-                const data = await res.json();
-                setSignups(data);
-            } catch (err) {
-                // ignore for now
-            }
-        };
         fetchEvent();
         fetchSignups();
     }, [id]);
 
-    if (isLoading) return <div>Nalaganje...</div>;
-    if (error) return <div className="text-center text-red-600">{error}</div>;
-    if (!event) return <div>Nalaganje...</div>;
+    const fetchEvent = async () => {
+        try {
+            const res = await fetch(`http://localhost:5000/api/events/${id}`);
+            if (!res.ok) throw new Error('Napaka pri pridobivanju dogodka');
+            const data = await res.json();
+            setEvent(data);
+            setDateOptions(data.dateOptions || []);
+        } catch (err) {
+            setError('Napaka pri pridobivanju dogodka');
+        }
+    };
 
-    const isOwner = user && event.ownerId === user.sub;
-    const canSignup = event.allowSignup && !isOwner && (!event.maxSignups || signups.length < event.maxSignups);
+    const fetchSignups = async () => {
+        try {
+            const res = await fetch(`http://localhost:5000/api/signups/${id}`);
+            if (!res.ok) return;
+            const data = await res.json();
+            setSignups(data);
+        } catch (err) {
+            // ignore
+        }
+    };
+
+    const isOwner = user && event?.ownerId === user.sub;
     const isSignedUp = user && signups.some(s => s.userId === user.sub);
+    const canSignup = event?.allowSignup && !isOwner && (!event?.maxSignups || signups.length < event.maxSignups);
 
     const handleEditClick = () => {
         setEditData(event);
         setIsEditing(true);
     };
 
-    const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         if (!editData) return;
         const { name, value } = e.target;
-        setEditData({ ...editData, [name]: value });
+        setEditData(prev => prev ? { ...prev, [name]: value } : null);
     };
 
     const handleEditSubmit = async (e: React.FormEvent) => {
@@ -92,7 +99,7 @@ const EventDetails = () => {
         if (!editData) return;
         try {
             const token = await getAccessTokenSilently();
-            const response = await fetch(`http://localhost:5000/api/events/${event.id}`, {
+            const response = await fetch(`http://localhost:5000/api/events/${event?.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -100,11 +107,11 @@ const EventDetails = () => {
                 },
                 body: JSON.stringify(editData)
             });
-            if (!response.ok) throw new Error('Napaka pri urejanju dogodka');
+            if (!response.ok) throw new Error();
             const updated = await response.json();
             setEvent(updated);
             setIsEditing(false);
-        } catch (err) {
+        } catch {
             setError('Napaka pri urejanju dogodka');
         }
     };
@@ -113,16 +120,47 @@ const EventDetails = () => {
         if (!window.confirm('Si prepričan, da želiš izbrisati dogodek?')) return;
         try {
             const token = await getAccessTokenSilently();
-            const response = await fetch(`http://localhost:5000/api/events/${event.id}`, {
+            const res = await fetch(`http://localhost:5000/api/events/${event?.id}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
-            if (!response.ok) throw new Error('Napaka pri brisanju dogodka');
+            if (!res.ok) throw new Error();
             navigate('/events');
-        } catch (err) {
+        } catch {
             setError('Napaka pri brisanju dogodka');
+        }
+    };
+
+    const vote = async (dateOptionId: string) => {
+        try {
+            const token = await getAccessTokenSilently();
+            await fetch(`http://localhost:5000/api/events/vote/${dateOptionId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            fetchEvent();
+        } catch {
+            console.error('Napaka pri glasovanju');
+        }
+    };
+
+    const setAsFinal = async (dateOptionId: string) => {
+        try {
+            const token = await getAccessTokenSilently();
+            await fetch(`http://localhost:5000/api/events/${event?.id}/final-date/${dateOptionId}`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            fetchEvent();
+        } catch {
+            console.error('Napaka pri nastavitvi končnega datuma');
         }
     };
 
@@ -135,151 +173,91 @@ const EventDetails = () => {
         e.preventDefault();
         setSignupError('');
         setSignupSuccess('');
-        if (!signupData.name.trim() || !signupData.surname.trim() || !signupData.age) {
-            setSignupError('Vsa polja so obvezna!');
+
+        if (!signupData.name || !signupData.surname || !signupData.age) {
+            setSignupError('Vsa polja so obvezna');
             return;
         }
+
         try {
-            const res = await fetch(`http://localhost:5000/api/signups/${event.id}`, {
+            const res = await fetch(`http://localhost:5000/api/signups/${event?.id}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    name: signupData.name,
-                    surname: signupData.surname,
+                    ...signupData,
                     age: parseInt(signupData.age),
-                    userId: user ? user.sub : null
+                    userId: user?.sub || null
                 })
             });
             if (!res.ok) {
-                const errData = await res.json();
-                setSignupError(errData.error || 'Napaka pri prijavi');
+                const data = await res.json();
+                setSignupError(data.error || 'Napaka pri prijavi');
                 return;
             }
+
             setSignupSuccess('Uspešno prijavljen!');
             setShowSignupForm(false);
             setSignupData({ name: '', surname: '', age: '' });
-            // Refresh prijav
-            const res2 = await fetch(`http://localhost:5000/api/signups/${event.id}`);
-            setSignups(await res2.json());
-        } catch (err) {
+            fetchSignups();
+        } catch {
             setSignupError('Napaka pri prijavi');
         }
     };
 
     const handleCancelSignup = async () => {
         if (!user) return;
-        setSignupError('');
-        setSignupSuccess('');
         try {
-            await fetch(`http://localhost:5000/api/signups/${event.id}/${user.sub}`, {
+            await fetch(`http://localhost:5000/api/signups/${event?.id}/${user.sub}`, {
                 method: 'DELETE'
             });
-            // Refresh prijav
-            const res2 = await fetch(`http://localhost:5000/api/signups/${event.id}`);
-            setSignups(await res2.json());
+            fetchSignups();
             setSignupSuccess('Uspešno odjavljen!');
-        } catch (err) {
+        } catch {
             setSignupError('Napaka pri odjavi');
         }
     };
 
-    const handleOwnerRemoveSignup = async (userIdToRemove: string | undefined) => {
+    const handleOwnerRemoveSignup = async (userIdToRemove?: string) => {
         if (!userIdToRemove) return;
         try {
-            await fetch(`http://localhost:5000/api/signups/${event.id}/${userIdToRemove}`, {
+            await fetch(`http://localhost:5000/api/signups/${event?.id}/${userIdToRemove}`, {
                 method: 'DELETE'
             });
-            // Refresh prijav
-            const res2 = await fetch(`http://localhost:5000/api/signups/${event.id}`);
-            setSignups(await res2.json());
-        } catch (err) {
+            fetchSignups();
+        } catch {
             setSignupError('Napaka pri odjavi uporabnika');
         }
     };
 
+    if (isLoading || !event) return <div>Nalaganje...</div>;
+    if (error) return <div className="text-red-600 text-center">{error}</div>;
 
     return (
         <div className="w-full min-h-screen bg-gray-100 px-4 py-8 flex justify-center items-start">
             <div className="w-full max-w-xl bg-white shadow rounded-lg p-6">
-                {event.imageUrl && (
-                    <img src={event.imageUrl} alt={event.title} className="w-full h-64 object-cover rounded mb-4" />
-                )}
+                {event.imageUrl && <img src={event.imageUrl} alt={event.title} className="w-full h-64 object-cover rounded mb-4" />}
                 {isOwner && !isEditing && (
                     <div className="flex gap-2 mb-4">
                         <button onClick={handleEditClick} className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Uredi</button>
                         <button onClick={handleDelete} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Izbriši</button>
                     </div>
                 )}
+
                 {isEditing ? (
                     <form onSubmit={handleEditSubmit} className="space-y-4">
-                        <input
-                            type="text"
-                            name="title"
-                            value={editData?.title || ''}
-                            onChange={handleEditChange}
-                            className="w-full border rounded p-2"
-                            placeholder="Naslov"
-                        />
-                        <textarea
-                            name="description"
-                            value={editData?.description || ''}
-                            onChange={handleEditChange}
-                            className="w-full border rounded p-2"
-                            placeholder="Opis"
-                        />
-                        <input
-                            type="datetime-local"
-                            name="dateTime"
-                            value={editData?.dateTime ? editData.dateTime.slice(0, 16) : ''}
-                            onChange={handleEditChange}
-                            className="w-full border rounded p-2"
-                        />
-                        <input
-                            type="text"
-                            name="location"
-                            value={editData?.location || ''}
-                            onChange={handleEditChange}
-                            className="w-full border rounded p-2"
-                            placeholder="Lokacija"
-                        />
-                        <input
-                            type="url"
-                            name="imageUrl"
-                            value={editData?.imageUrl || ''}
-                            onChange={handleEditChange}
-                            className="w-full border rounded p-2"
-                            placeholder="URL slike"
-                        />
-
-                        {/* 🔽 Novo polje za spremembo vidnosti */}
-                        <div>
-                            <label className="block font-semibold mb-1">Vidnost dogodka</label>
-                            <select
-                                name="visibility"
-                                className="w-full border p-2 rounded"
-                                value={editData?.visibility || 'public'}
-                                onChange={handleEditChange}
-                            >
-                                <option value="public">Javen</option>
-                                <option value="private">Zaseben</option>
-                                <option value="selected">Izbrani uporabniki</option>
-                            </select>
-                        </div>
-
+                        <input type="text" name="title" value={editData?.title || ''} onChange={handleEditChange} className="w-full border rounded p-2" placeholder="Naslov" />
+                        <textarea name="description" value={editData?.description || ''} onChange={handleEditChange} className="w-full border rounded p-2" placeholder="Opis" />
+                        <input type="datetime-local" name="dateTime" value={editData?.dateTime?.slice(0, 16) || ''} onChange={handleEditChange} className="w-full border rounded p-2" />
+                        <input type="text" name="location" value={editData?.location || ''} onChange={handleEditChange} className="w-full border rounded p-2" placeholder="Lokacija" />
+                        <input type="url" name="imageUrl" value={editData?.imageUrl || ''} onChange={handleEditChange} className="w-full border rounded p-2" placeholder="URL slike" />
+                        <select name="visibility" value={editData?.visibility || 'public'} onChange={handleEditChange} className="w-full border rounded p-2">
+                            <option value="public">Javno</option>
+                            <option value="private">Zasebno</option>
+                            <option value="selected">Izbrani uporabniki</option>
+                        </select>
                         <div className="flex gap-2">
-                            <button
-                                type="submit"
-                                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                            >
-                                Shrani
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setIsEditing(false)}
-                                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
-                            >
-                                Prekliči
-                            </button>
+                            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Shrani</button>
+                            <button type="button" onClick={() => setIsEditing(false)} className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">Prekliči</button>
                         </div>
                     </form>
                 ) : (
@@ -288,23 +266,41 @@ const EventDetails = () => {
                         <p className="mb-2">{event.description}</p>
                         <p className="text-gray-600 mb-2">Datum: {new Date(event.dateTime).toLocaleString()}</p>
                         <p className="text-gray-600 mb-2">Lokacija: {event.location}</p>
-                        <p><strong>Vidnost:</strong> {
-                            event.visibility === 'public' ? 'Javen' :
-                                event.visibility === 'private' ? 'Zaseben' :
-                                    event.visibility === 'selected' ? 'Izbrani uporabniki' : 'Ni določeno'
-                        }</p>
+                        <p className="mb-2"><strong>Vidnost:</strong> {event.visibility === 'public' ? 'Javen' : event.visibility === 'private' ? 'Zaseben' : 'Izbrani uporabniki'}</p>
 
-                        <div className="flex items-center gap-2 mb-2">
-                            <span className="font-semibold">Organizator:</span>
-                            {event.User ? (
-                                <span className="flex items-center gap-2">
-                                    {event.User.picture && <img src={event.User.picture} alt={event.User.name} className="w-6 h-6 rounded-full inline" />}
-                                    {event.User.name} {event.User.surname || ''}
-                                </span>
-                            ) : event.ownerId}
-                        </div>
+                        {dateOptions.length > 0 && (
+                            <div className="mb-4">
+                                <h3 className="font-semibold text-gray-800 mb-2">Možni termini:</h3>
+                                <ul className="space-y-2">
+                                    {dateOptions.map(option => (
+                                        <li key={option.id} className="flex justify-between items-center border p-2 rounded">
+                                            <span>
+                                                {new Date(option.dateOption).toLocaleString()}
+                                                {option.isFinal && <span className="ml-2 text-green-600 font-semibold">(Izbran)</span>}
+                                                {!option.isFinal && (
+                                                    <span className="text-gray-500 text-sm ml-2">
+                                                        ({option.votes?.length || 0} glasov)
+                                                    </span>
+                                                )}
+                                            </span>
+                                            {!option.isFinal && (
+                                                <div className="flex gap-2">
+                                                    {user && !option.votes?.some(v => v.userId === user.sub) && (
+                                                        <button onClick={() => vote(option.id)} className="bg-blue-500 text-white px-2 py-1 rounded text-sm hover:bg-blue-600">Glasuj</button>
+                                                    )}
+                                                    {isOwner && (
+                                                        <button onClick={() => setAsFinal(option.id)} className="bg-green-600 text-white px-2 py-1 rounded text-sm hover:bg-green-700">Nastavi kot končni</button>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
                         {user && canSignup && !showSignupForm && !isSignedUp && (
-                            <button onClick={() => setShowSignupForm(true)} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mb-4">Prijavi se na dogodek</button>
+                            <button onClick={() => setShowSignupForm(true)} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mb-4">Prijavi se</button>
                         )}
                         {user && isSignedUp && (
                             <button onClick={handleCancelSignup} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 mb-4">Odjavi se</button>
@@ -317,15 +313,17 @@ const EventDetails = () => {
                                 {signupError && <div className="text-red-600">{signupError}</div>}
                                 {signupSuccess && <div className="text-green-600">{signupSuccess}</div>}
                                 <div className="flex gap-2">
-                                    <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Potrdi prijavo</button>
+                                    <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Potrdi</button>
                                     <button type="button" onClick={() => setShowSignupForm(false)} className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">Prekliči</button>
                                 </div>
                             </form>
                         )}
+
                         {event.allowSignup && (
-                            <div className="mb-4 text-gray-700">Število prijavljenih: {signups.length}{event.maxSignups ? ` / ${event.maxSignups}` : ''}</div>
+                            <div className="mb-4 text-gray-700">Prijavljeni: {signups.length}{event.maxSignups ? ` / ${event.maxSignups}` : ''}</div>
                         )}
-                        {isOwner && event.allowSignup && (
+
+                        {isOwner && signups.length > 0 && (
                             <div className="mb-4">
                                 <h3 className="font-semibold mb-2 text-gray-700">Prijavljeni:</h3>
                                 <ul className="list-disc pl-5">
@@ -335,13 +333,12 @@ const EventDetails = () => {
                                             <button
                                                 onClick={() => handleOwnerRemoveSignup(s.userId)}
                                                 className="ml-2 text-red-600 hover:underline text-sm"
-                                                disabled={user && user.sub === s.userId}
+                                                disabled={user?.sub === s.userId}
                                             >
                                                 Odjavi
                                             </button>
                                         </li>
                                     ))}
-                                    {signups.length === 0 && <li className="text-gray-700">Nihče še ni prijavljen.</li>}
                                 </ul>
                             </div>
                         )}
