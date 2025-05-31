@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import FullCalendar from '@fullcalendar/react';
@@ -30,6 +31,7 @@ const Profile = () => {
     const [events, setEvents] = useState<EventData[]>([]);
     const [registeredIds, setRegisteredIds] = useState<string[]>([]);
     const [filter, setFilter] = useState<'all' | 'created' | 'registered'>('all');
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (!isAuthenticated) return;
@@ -199,6 +201,10 @@ const Profile = () => {
                             date: e.dateTime
                         }))}
                         height="auto"
+                        eventClick={(info) => {
+                            info.jsEvent.preventDefault();
+                            navigate(`/events/${info.event.id}`);
+                        }}
                     />
                 </div>
             </div>
