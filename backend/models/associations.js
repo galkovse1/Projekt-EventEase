@@ -2,6 +2,14 @@ const User = require('./User');
 const Event = require('./Event');
 const EventSignup = require('./EventSignup');
 const EventVisibility = require('./EventVisibility');
+const EventDateOption = require('./EventDateOption');
+const DateVote = require('./DateVote');
+
+Event.hasMany(EventDateOption, { foreignKey: 'eventId', as: 'dateOptions' });
+EventDateOption.belongsTo(Event, { foreignKey: 'eventId' });
+
+EventDateOption.hasMany(DateVote, { foreignKey: 'dateOptionId', as: 'votes' });
+DateVote.belongsTo(EventDateOption, { foreignKey: 'dateOptionId' });
 
 // Event owner
 Event.belongsTo(User, { foreignKey: 'ownerId', targetKey: 'auth0Id', as: 'User' });
@@ -24,4 +32,4 @@ User.belongsToMany(Event, {
     otherKey: 'EventId'
 });
 
-module.exports = { User, Event, EventSignup, EventVisibility };
+module.exports = { User, Event, EventSignup, EventVisibility, EventDateOption, DateVote };
