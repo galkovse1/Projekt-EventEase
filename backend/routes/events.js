@@ -6,7 +6,10 @@ const {
   createEvent,
   updateEvent,
   deleteEvent,
-  getVisibleEvents
+  getVisibleEvents,
+  createDateOptions,
+  voteForDate,
+  setFinalDate
 } = require('../controllers/eventController');
 const checkJwt = require('../middleware/auth');
 
@@ -20,5 +23,9 @@ router.use(checkJwt);
 router.post('/', createEvent);
 router.put('/:id', updateEvent);
 router.delete('/:id', deleteEvent);
+
+router.post('/:id/date-options', createDateOptions); // organizator doda možnosti
+router.post('/vote/:dateOptionId', voteForDate);     // uporabnik glasuje
+router.post('/:eventId/final-date/:dateOptionId', setFinalDate); // organizator izbere končni datum
 
 module.exports = router;
