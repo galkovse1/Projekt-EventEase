@@ -47,4 +47,21 @@ const cancelSignup = async (req, res) => {
     res.status(204).send();
 };
 
-module.exports = { signupToEvent, getEventSignups, cancelSignup };
+const getUserSignups = async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        const signups = await EventSignup.findAll({
+            where: { userId },
+            attributes: ['eventId'] // samo eventId, nič osebnega
+        });
+
+        const eventIds = signups.map(signup => signup.eventId);
+        res.json(eventIds);
+    } catch (error) {
+        console.error('Napaka pri pridobivanju prijav uporabnika:', error);
+        res.status(500).json({ error: 'Napaka pri pridobivanju prijav' });
+    }
+};
+
+module.exports = { signupToEvent, getEventSignups, cancelSignup, getUserSignups };
