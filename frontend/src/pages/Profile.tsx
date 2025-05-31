@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
-//V terminalu iz frontend mape zaženi: npm install @fullcalendar/react @fullcalendar/daygrid
 
 interface UserProfile {
     auth0Id: string;
@@ -18,15 +17,19 @@ interface EventData {
     id: string;
     title: string;
     dateTime: string;
+    ownerId: string;
+    registered?: boolean;
 }
 
 const Profile = () => {
     const { getAccessTokenSilently, isAuthenticated, isLoading } = useAuth0();
     const [profile, setProfile] = useState<UserProfile | null>(null);
-    const [edit, setEdit] = useState(false);
     const [form, setForm] = useState({ name: '', surname: '', description: '', picture: '', wantsNotifications: false });
+    const [edit, setEdit] = useState(false);
     const [error, setError] = useState('');
     const [events, setEvents] = useState<EventData[]>([]);
+    const [registeredIds, setRegisteredIds] = useState<string[]>([]);
+    const [filter, setFilter] = useState<'all' | 'created' | 'registered'>('all');
 
     useEffect(() => {
         if (!isAuthenticated) return;
@@ -37,7 +40,6 @@ const Profile = () => {
                 const res = await fetch('http://localhost:5000/api/users/profile', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                if (!res.ok) throw new Error('Napaka pri pridobivanju profila');
                 const data = await res.json();
                 setProfile(data);
                 setForm({
@@ -58,7 +60,6 @@ const Profile = () => {
                 const res = await fetch('http://localhost:5000/api/events', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                if (!res.ok) throw new Error('Napaka pri dogodkih');
                 const data = await res.json();
                 setEvents(data);
             } catch {
@@ -69,6 +70,25 @@ const Profile = () => {
         fetchProfile();
         fetchEvents();
     }, [getAccessTokenSilently, isAuthenticated]);
+
+    useEffect(() => {
+        if (profile) {
+            fetchRegistrations();
+        }
+    }, [profile]);
+
+    const fetchRegistrations = async () => {
+        try {
+            const token = await getAccessTokenSilently();
+            const res = await fetch(`http://localhost:5000/api/signups/user/${profile?.auth0Id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const data = await res.json(); // npr. ["event1", "event3"]
+            setRegisteredIds(data);
+        } catch (error) {
+            console.error('Napaka pri pridobivanju prijav:', error);
+        }
+    };
 
     const handleSave = async () => {
         try {
@@ -81,7 +101,6 @@ const Profile = () => {
                 },
                 body: JSON.stringify(form)
             });
-            if (!res.ok) throw new Error('Napaka pri shranjevanju profila');
             const data = await res.json();
             setProfile(data);
             setEdit(false);
@@ -89,6 +108,18 @@ const Profile = () => {
             setError('Napaka pri shranjevanju profila');
         }
     };
+
+    const filteredEvents = events
+        .map(e => ({
+            ...e,
+            registered: registeredIds.includes(e.id)
+        }))
+        .filter(event => {
+            if (filter === 'all') return true;
+            if (filter === 'created') return event.ownerId === profile?.auth0Id;
+            if (filter === 'registered') return event.registered;
+            return true;
+        });
 
     if (isLoading) return <div>Nalaganje...</div>;
     if (!isAuthenticated) return <div>Za ogled profila se morate prijaviti.</div>;
@@ -143,13 +174,27 @@ const Profile = () => {
                     </div>
                 </div>
 
-                {/* Dodan koledar */}
                 <div className="bg-white shadow rounded-lg p-6">
                     <h2 className="text-xl font-semibold text-center mb-4">Koledar dogodkov</h2>
+
+                    <div className="mb-4 text-center">
+                        <label className="mr-2 font-semibold text-gray-700">Filtriraj:</label>
+                        <select
+                            value={filter}
+                            onChange={(e) => setFilter(e.target.value as any)}
+                            className="p-2 border rounded-md"
+                        >
+                            <option value="all">Vsi dogodki</option>
+                            <option value="created">Moji dogodki</option>
+                            <option value="registered">Prijavljen</option>
+                        </select>
+                    </div>
+
                     <FullCalendar
                         plugins={[dayGridPlugin]}
                         initialView="dayGridMonth"
-                        events={events.map(e => ({
+                        events={filteredEvents.map(e => ({
+                            id: e.id,
                             title: e.title,
                             date: e.dateTime
                         }))}
