@@ -29,6 +29,10 @@ const CreateEvent = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<UserType[]>([]);
     const [selectedUsers, setSelectedUsers] = useState<UserType[]>([]);
+    const [multiDateMode, setMultiDateMode] = useState(false);
+    const [multipleDates, setMultipleDates] = useState<string[]>([]);
+    const [newDateInput, setNewDateInput] = useState('');
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
@@ -71,14 +75,22 @@ const CreateEvent = () => {
             setError('Naslov je obvezen');
             return false;
         }
-        if (!formData.dateTime) {
+
+        if (!multiDateMode && !formData.dateTime) {
             setError('Datum je obvezen');
             return false;
         }
-        if (new Date(formData.dateTime) < new Date()) {
+
+        if (!multiDateMode && new Date(formData.dateTime) < new Date()) {
             setError('Datum ne sme biti v preteklosti');
             return false;
         }
+
+        if (multiDateMode && multipleDates.length < 2) {
+            setError('Dodaj vsaj dva datuma za glasovanje');
+            return false;
+        }
+
         return true;
     };
 
@@ -110,7 +122,7 @@ const CreateEvent = () => {
                 body: JSON.stringify({
                     title,
                     description,
-                    dateTime,
+                    dateTime: multiDateMode ? new Date(multipleDates[0]).toISOString() : dateTime,
                     location,
                     imageUrl,
                     allowSignup,
@@ -124,12 +136,27 @@ const CreateEvent = () => {
                 throw new Error('Napaka pri ustvarjanju dogodka');
             }
 
+            const newEvent = await response.json();
+
+            // 🔽 Pošlji možnosti datumov, če je omogočeno glasovanje
+            if (multiDateMode && multipleDates.length > 0) {
+                await fetch(`http://localhost:5000/api/events/${newEvent.id}/date-options`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ dates: multipleDates })
+                });
+            }
+
             navigate('/events');
         } catch (err) {
             setError('Napaka pri ustvarjanju dogodka');
             console.error(err);
         }
     };
+
 
     return (
         <div className="w-full min-h-screen bg-gray-100 px-4 py-8 flex justify-center items-start">
@@ -151,10 +178,73 @@ const CreateEvent = () => {
                         <textarea id="description" name="description" value={formData.description} onChange={handleChange} rows={4} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
                     </div>
 
-                    <div>
-                        <label htmlFor="dateTime" className="block text-sm font-medium text-gray-700">Datum in čas</label>
-                        <input type="datetime-local" id="dateTime" name="dateTime" value={formData.dateTime} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
+                    <div className="mb-4">
+                        <label className="flex items-center space-x-2">
+                            <input
+                                type="checkbox"
+                                checked={multiDateMode}
+                                onChange={(e) => setMultiDateMode(e.target.checked)}
+                            />
+                            <span>Omogoči več možnih datumov (glasovanje)</span>
+                        </label>
                     </div>
+
+                    {multiDateMode ? (
+                        <>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Dodaj možni datum</label>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="datetime-local"
+                                        value={newDateInput}
+                                        onChange={(e) => setNewDateInput(e.target.value)}
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            if (newDateInput && !multipleDates.includes(newDateInput)) {
+                                                setMultipleDates([...multipleDates, newDateInput]);
+                                                setNewDateInput('');
+                                            }
+                                        }}
+                                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                                    >
+                                        Dodaj
+                                    </button>
+                                </div>
+                            </div>
+
+                            {multipleDates.length > 0 && (
+                                <ul className="mt-2 space-y-1 text-sm text-gray-700">
+                                    {multipleDates.map((d, i) => (
+                                        <li key={i} className="flex justify-between items-center">
+                                            <span>{new Date(d).toLocaleString()}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => setMultipleDates(prev => prev.filter(val => val !== d))}
+                                                className="text-red-600 hover:underline text-xs"
+                                            >
+                                                Odstrani
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </>
+                    ) : (
+                        <div>
+                            <label htmlFor="dateTime" className="block text-sm font-medium text-gray-700">Datum in čas</label>
+                            <input
+                                type="datetime-local"
+                                id="dateTime"
+                                name="dateTime"
+                                value={formData.dateTime}
+                                onChange={handleChange}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                            />
+                        </div>
+                    )}
 
                     <div>
                         <label htmlFor="location" className="block text-sm font-medium text-gray-700">Lokacija</label>
