@@ -3,6 +3,8 @@ const Event = require('../models/Event');
 const User = require('../models/User');
 const EventVisibility = require('../models/EventVisibility');
 const { sendEventNotification } = require('../utils/emailService');
+const EventDateOption = require('../models/EventDateOption');
+const DateVote = require('../models/DateVote');
 
 const getAllEvents = async (req, res) => {
   const events = await Event.findAll({
@@ -13,11 +15,34 @@ const getAllEvents = async (req, res) => {
 };
 
 const getEventById = async (req, res) => {
-  const event = await Event.findByPk(req.params.id, {
-    include: { model: User, as: 'User', attributes: ['auth0Id', 'name', 'surname', 'email', 'picture'] }
-  });
-  if (!event) return res.status(404).json({ error: 'Dogodek ne obstaja' });
-  res.json(event);
+  try {
+    const event = await Event.findByPk(req.params.id, {
+      include: [
+        {
+          model: User,
+          as: 'User',
+          attributes: ['auth0Id', 'name', 'surname', 'email', 'picture']
+        },
+        {
+          model: EventDateOption,
+          as: 'dateOptions', // TOČNO kot v associations.js
+          include: [
+            {
+              model: DateVote,
+              as: 'votes', // TOČNO kot v associations.js
+              attributes: ['userId']
+            }
+          ]
+        }
+      ]
+    });
+
+    if (!event) return res.status(404).json({ error: 'Dogodek ne obstaja' });
+    res.json(event);
+  } catch (err) {
+    console.error('Napaka v getEventById:', err);
+    res.status(500).json({ error: 'Napaka pri pridobivanju dogodka' });
+  }
 };
 
 const createEvent = async (req, res) => {
@@ -210,6 +235,57 @@ const getVisibleEvents = async (req, res) => {
   }
 };
 
+// Ustvari več datumskih možnosti
+const createDateOptions = async (req, res) => {
+  const { id } = req.params;
+  const { dates } = req.body; // array of ISO date strings
+  const event = await Event.findByPk(id);
+  if (!event) return res.status(404).json({ error: 'Dogodek ne obstaja' });
+
+  const auth0Id = req.auth.payload.sub;
+  if (event.ownerId !== auth0Id) return res.status(403).json({ error: 'Ni dovoljenja' });
+
+  const options = dates.map(date => ({
+    eventId: id,
+    dateOption: date
+  }));
+  await EventDateOption.bulkCreate(options);
+  res.status(201).json({ message: 'Datum možnosti shranjene' });
+};
+
+// Glasuj za termin
+const voteForDate = async (req, res) => {
+  const userId = req.auth.payload.sub;
+  const { dateOptionId } = req.params;
+
+  const existingVote = await DateVote.findOne({ where: { userId, dateOptionId } });
+  if (existingVote) return res.status(400).json({ error: 'Že ste glasovali za ta datum' });
+
+  await DateVote.create({ userId, dateOptionId });
+  res.json({ message: 'Glas oddan' });
+};
+
+// Organizator izbere končni datum
+const setFinalDate = async (req, res) => {
+  const { eventId, dateOptionId } = req.params;
+  const auth0Id = req.auth.payload.sub;
+
+  const event = await Event.findByPk(eventId);
+  if (!event || event.ownerId !== auth0Id)
+    return res.status(403).json({ error: 'Ni dovoljenja' });
+
+  // označi izbrani kot final
+  await EventDateOption.update({ isFinal: false }, { where: { eventId } });
+  await EventDateOption.update({ isFinal: true }, { where: { id: dateOptionId } });
+
+  // shrani v glavni dogodek
+  const selectedOption = await EventDateOption.findByPk(dateOptionId);
+  event.dateTime = selectedOption.dateOption;
+  await event.save();
+
+  res.json({ message: 'Končni datum izbran' });
+};
+
 
 module.exports = {
   getAllEvents,
@@ -217,5 +293,8 @@ module.exports = {
   createEvent,
   updateEvent,
   deleteEvent,
-  getVisibleEvents
+  getVisibleEvents,
+  createDateOptions,
+  voteForDate,
+  setFinalDate
 };
