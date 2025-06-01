@@ -253,50 +253,52 @@ const EventDetails = () => {
     if (error) return <div className="text-red-600 text-center">{error}</div>;
 
     return (
-        <div className="w-full min-h-screen bg-gray-100 px-4 py-8 flex justify-center items-start">
+        <div className="w-full min-h-screen bg-[#f7f7fa] px-4 py-12 flex justify-center items-start">
             <Helmet>
                 <title>{event ? `Dogodek: ${event.title} | EventEase` : 'Dogodek | EventEase'}</title>
             </Helmet>
-            <div className="w-full max-w-xl bg-white shadow rounded-lg p-6">
-                {event.imageUrl && <img src={event.imageUrl} alt={event.title} className="w-full h-64 object-cover rounded mb-4" />}
+            <div className="w-full max-w-2xl bg-white shadow-2xl rounded-3xl p-10">
+                {event.imageUrl && <img src={event.imageUrl} alt={event.title} className="w-full h-72 object-cover rounded-2xl mb-6 shadow" />}
                 {isOwner && !isEditing && (
-                    <div className="flex gap-2 mb-4">
-                        <button onClick={handleEditClick} className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Uredi</button>
-                        <button onClick={handleDelete} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Izbriši</button>
+                    <div className="flex gap-4 mb-6 justify-end">
+                        <button onClick={handleEditClick} className="bg-yellow-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-yellow-600 transition-colors">Uredi</button>
+                        <button onClick={handleDelete} className="bg-red-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-700 transition-colors">Izbriši</button>
                     </div>
                 )}
 
                 {isEditing ? (
-                    <form onSubmit={handleEditSubmit} className="space-y-4">
-                        <input type="text" name="title" value={editData?.title || ''} onChange={handleEditChange} className="w-full border rounded p-2" placeholder="Naslov" />
-                        <textarea name="description" value={editData?.description || ''} onChange={handleEditChange} className="w-full border rounded p-2" placeholder="Opis" />
-                        <input type="datetime-local" name="dateTime" value={editData?.dateTime?.slice(0, 16) || ''} onChange={handleEditChange} className="w-full border rounded p-2" />
-                        <input type="text" name="location" value={editData?.location || ''} onChange={handleEditChange} className="w-full border rounded p-2" placeholder="Lokacija" />
-                        <input type="url" name="imageUrl" value={editData?.imageUrl || ''} onChange={handleEditChange} className="w-full border rounded p-2" placeholder="URL slike" />
-                        <select name="visibility" value={editData?.visibility || 'public'} onChange={handleEditChange} className="w-full border rounded p-2">
+                    <form onSubmit={handleEditSubmit} className="space-y-6">
+                        <input type="text" name="title" value={editData?.title || ''} onChange={handleEditChange} className="w-full border rounded-lg p-3 text-lg" placeholder="Naslov" />
+                        <textarea name="description" value={editData?.description || ''} onChange={handleEditChange} className="w-full border rounded-lg p-3 text-lg" placeholder="Opis" />
+                        <input type="datetime-local" name="dateTime" value={editData?.dateTime?.slice(0, 16) || ''} onChange={handleEditChange} className="w-full border rounded-lg p-3 text-lg" />
+                        <input type="text" name="location" value={editData?.location || ''} onChange={handleEditChange} className="w-full border rounded-lg p-3 text-lg" placeholder="Lokacija" />
+                        <input type="url" name="imageUrl" value={editData?.imageUrl || ''} onChange={handleEditChange} className="w-full border rounded-lg p-3 text-lg" placeholder="URL slike" />
+                        <select name="visibility" value={editData?.visibility || 'public'} onChange={handleEditChange} className="w-full border rounded-lg p-3 text-lg">
                             <option value="public">Javno</option>
                             <option value="private">Zasebno</option>
                             <option value="selected">Izbrani uporabniki</option>
                         </select>
-                        <div className="flex gap-2">
-                            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Shrani</button>
-                            <button type="button" onClick={() => setIsEditing(false)} className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">Prekliči</button>
+                        <div className="flex gap-4 justify-end">
+                            <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors">Shrani</button>
+                            <button type="button" onClick={() => setIsEditing(false)} className="bg-gray-400 text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-500 transition-colors">Prekliči</button>
                         </div>
                     </form>
                 ) : (
                     <>
-                        <h1 className="text-3xl font-bold mb-2 text-gray-900">{event.title}</h1>
-                        <p className="mb-2 text-gray-900">{event.description}</p>
-                        <p className="text-gray-700 mb-2">Datum: {new Date(event.dateTime).toLocaleString()}</p>
-                        <p className="text-gray-700 mb-2">Lokacija: {event.location}</p>
-                        <p className="mb-2 text-gray-700"><strong>Vidnost:</strong> {event.visibility === 'public' ? 'Javen' : event.visibility === 'private' ? 'Zaseben' : 'Izbrani uporabniki'}</p>
+                        <h1 className="text-4xl font-extrabold mb-4 text-gray-900 text-center">{event.title}</h1>
+                        <p className="mb-4 text-gray-800 text-center text-lg">{event.description}</p>
+                        <div className="flex flex-col md:flex-row md:justify-between gap-2 mb-4 text-gray-700 text-base">
+                            <span><strong>Datum:</strong> {new Date(event.dateTime).toLocaleString()}</span>
+                            <span><strong>Lokacija:</strong> {event.location}</span>
+                        </div>
+                        <p className="mb-4 text-gray-700 text-center"><strong>Vidnost:</strong> {event.visibility === 'public' ? 'Javen' : event.visibility === 'private' ? 'Zaseben' : 'Izbrani uporabniki'}</p>
 
                         {(dateOptions || []).length > 0 && (
-                            <div className="mb-4">
-                                <h3 className="font-semibold text-gray-900 mb-2">Možni termini:</h3>
+                            <div className="mb-6">
+                                <h3 className="font-semibold text-gray-900 mb-2 text-center">Možni termini:</h3>
                                 <ul className="space-y-2">
                                     {(dateOptions || []).map(option => (
-                                        <li key={option.id} className="flex justify-between items-center border p-2 rounded bg-white">
+                                        <li key={option.id} className="flex justify-between items-center border p-3 rounded-xl bg-gray-50 shadow-sm">
                                             <span className="text-gray-900">
                                                 {new Date(option.dateOption).toLocaleString()}
                                                 {option.isFinal && <span className="ml-2 text-green-600 font-semibold">(Izbran)</span>}
@@ -310,11 +312,11 @@ const EventDetails = () => {
                                                 <div className="flex gap-2">
                                                     {user && (
                                                         option.votes?.some(v => v.userId === user.sub)
-                                                            ? <button onClick={() => deleteVote(option.id)} className="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600">Zbriši glas</button>
-                                                            : <button onClick={() => vote(option.id)} className="bg-blue-500 text-white px-2 py-1 rounded text-sm hover:bg-blue-600">Glasuj</button>
+                                                            ? <button onClick={() => deleteVote(option.id)} className="bg-red-500 text-white px-3 py-1 rounded-lg text-sm font-semibold hover:bg-red-600">Zbriši glas</button>
+                                                            : <button onClick={() => vote(option.id)} className="bg-blue-600 text-white px-3 py-1 rounded-lg text-sm font-semibold hover:bg-blue-700">Glasuj</button>
                                                     )}
                                                     {isOwner && (
-                                                        <button onClick={() => setAsFinal(option.id)} className="bg-green-600 text-white px-2 py-1 rounded text-sm hover:bg-green-700">Nastavi kot končni</button>
+                                                        <button onClick={() => setAsFinal(option.id)} className="bg-green-600 text-white px-3 py-1 rounded-lg text-sm font-semibold hover:bg-green-700">Nastavi kot končni</button>
                                                     )}
                                                 </div>
                                             )}
@@ -325,35 +327,35 @@ const EventDetails = () => {
                         )}
 
                         {user && canSignup && !showSignupForm && !isSignedUp && (
-                            <button onClick={() => setShowSignupForm(true)} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mb-4">Prijavi se</button>
+                            <button onClick={() => setShowSignupForm(true)} className="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 mb-6 w-full max-w-xs mx-auto block">Prijavi se</button>
                         )}
                         {user && isSignedUp && (
-                            <button onClick={handleCancelSignup} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 mb-4">Odjavi se</button>
+                            <button onClick={handleCancelSignup} className="bg-red-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-700 mb-6 w-full max-w-xs mx-auto block">Odjavi se</button>
                         )}
                         {user && showSignupForm && (
-                            <form onSubmit={handleSignupSubmit} className="space-y-2 mb-4">
-                                <input type="text" name="name" value={signupData.name} onChange={handleSignupChange} placeholder="Ime" className="w-full border rounded p-2" />
-                                <input type="text" name="surname" value={signupData.surname} onChange={handleSignupChange} placeholder="Priimek" className="w-full border rounded p-2" />
-                                <input type="number" name="age" value={signupData.age} onChange={handleSignupChange} placeholder="Starost" className="w-full border rounded p-2" />
-                                {signupError && <div className="text-red-600">{signupError}</div>}
-                                {signupSuccess && <div className="text-green-600">{signupSuccess}</div>}
-                                <div className="flex gap-2">
-                                    <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Potrdi</button>
-                                    <button type="button" onClick={() => setShowSignupForm(false)} className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">Prekliči</button>
+                            <form onSubmit={handleSignupSubmit} className="space-y-4 mb-6">
+                                <input type="text" name="name" value={signupData.name} onChange={handleSignupChange} placeholder="Ime" className="w-full border rounded-lg p-3 text-lg" />
+                                <input type="text" name="surname" value={signupData.surname} onChange={handleSignupChange} placeholder="Priimek" className="w-full border rounded-lg p-3 text-lg" />
+                                <input type="number" name="age" value={signupData.age} onChange={handleSignupChange} placeholder="Starost" className="w-full border rounded-lg p-3 text-lg" />
+                                {signupError && <div className="text-red-600 text-center">{signupError}</div>}
+                                {signupSuccess && <div className="text-green-600 text-center">{signupSuccess}</div>}
+                                <div className="flex gap-4 justify-end">
+                                    <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700">Potrdi</button>
+                                    <button type="button" onClick={() => setShowSignupForm(false)} className="bg-gray-400 text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-500">Prekliči</button>
                                 </div>
                             </form>
                         )}
 
                         {event.allowSignup && (
-                            <div className="mb-4 text-gray-900">Prijavljeni: {signups.length}{event.maxSignups ? ` / ${event.maxSignups}` : ''}</div>
+                            <div className="mb-6 text-gray-900 text-center font-semibold">Prijavljeni: {signups.length}{event.maxSignups ? ` / ${event.maxSignups}` : ''}</div>
                         )}
 
                         {isOwner && signups.length > 0 && (
-                            <div className="mb-4">
-                                <h3 className="font-semibold mb-2 text-gray-900">Prijavljeni:</h3>
+                            <div className="mb-4 bg-gray-50 rounded-2xl shadow p-6">
+                                <h3 className="font-semibold mb-4 text-gray-900 text-center">Prijavljeni:</h3>
                                 <ul className="list-disc pl-5">
                                     {signups.map(s => (
-                                        <li key={s.id} className="text-gray-900 flex items-center justify-between">
+                                        <li key={s.id} className="text-gray-900 flex items-center justify-between py-1">
                                             <span>{s.name} {s.surname} ({s.age} let)</span>
                                             <button
                                                 onClick={() => handleOwnerRemoveSignup(s.userId)}

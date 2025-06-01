@@ -73,64 +73,45 @@ const EventList = () => {
             <Helmet>
                 <title>Dogodki | EventEase</title>
             </Helmet>
-            <div className="w-full min-h-screen bg-gray-100 px-4 py-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-6">Dogodki</h1>
-                <div className="mb-6 flex flex-col md:flex-row gap-4 items-start">
-                    <button
-                        className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
-                        onClick={() => setOnlyMine(prev => !prev)}
-                    >
-                        {onlyMine ? 'Prikaži vse dogodke' : 'Prikaži moje dogodke'}
-                    </button>
-                    <input type="text" placeholder="Išči po naslovu/opisu" value={search} onChange={e => setSearch(e.target.value)} className="p-2 border rounded w-full md:w-64" />
-                    <input type="text" placeholder="Filter po mestu" value={location} onChange={e => setLocation(e.target.value)} className="p-2 border rounded w-full md:w-64" />
-                    <input type="date" value={date} onChange={e => setDate(e.target.value)} className="p-2 border rounded w-full md:w-48" />
-                    <input type="text" placeholder="Organizator (ime/priemk)" value={organizer} onChange={e => setOrganizer(e.target.value)} className="p-2 border rounded w-full md:w-64" />
-                </div>
-                <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
-                    {events.map((event) => (
-                        <div key={event.id} className="bg-white rounded-lg shadow-md overflow-hidden w-full md:w-96">
-                            {event.imageUrl && (
-                                <img
-                                    src={event.imageUrl}
-                                    alt={event.title}
-                                    className="w-full h-48 object-cover"
-                                />
-                            )}
-                            <div className="p-6">
-                                <h2 className="text-xl font-semibold text-gray-900 mb-2">{event.title}</h2>
-                                <p className="text-gray-600 mb-4">{event.description}</p>
-                                <div className="text-sm text-gray-500 mb-4">
-                                    <p>Datum: {new Date(event.dateTime).toLocaleString()}</p>
-                                    <p>Lokacija: {event.location}</p>
-                                    <p>Vidnost: {event.visibility === 'public' ? 'Javno' : event.visibility === 'private' ? 'Zasebno' : 'Izbrani uporabniki'}</p>
-                                    <p>
-                                        Organizator:{' '}
-                                        {event.User ? (
-                                            <span className="flex items-center gap-2">
-                                                {event.User.picture && (
-                                                    <img
-                                                        src={event.User.picture}
-                                                        alt={event.User.name}
-                                                        className="w-6 h-6 rounded-full inline"
-                                                    />
-                                                )}
-                                                {event.User.name} {event.User.surname || ''}
-                                            </span>
-                                        ) : (
-                                            event.ownerId
-                                        )}
-                                    </p>
+            <div className="w-full min-h-screen bg-[#f7f7fa] px-4 py-12">
+                <h1 className="text-4xl font-bold text-gray-900 mb-10 text-center tracking-tight">Dogodki</h1>
+                <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 justify-items-center">
+                    {events.map((event) => {
+                        const eventDate = new Date(event.dateTime);
+                        const now = new Date();
+                        const daysDiff = Math.ceil((eventDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                        return (
+                            <div key={event.id} className="bg-white rounded-3xl shadow-xl overflow-hidden w-full max-w-xs flex flex-col transition-transform hover:scale-105 hover:shadow-2xl duration-200">
+                                {event.imageUrl && (
+                                    <img
+                                        src={event.imageUrl}
+                                        alt={event.title}
+                                        className="w-full h-48 object-cover"
+                                    />
+                                )}
+                                <div className="p-6 flex flex-col flex-1 justify-between items-center text-center">
+                                    <h2 className="text-2xl font-extrabold text-gray-900 mb-2">{event.title}</h2>
+                                    <div className="mb-2">
+                                        <div className="text-lg font-bold text-gray-900">
+                                            {eventDate.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                                        </div>
+                                        <div className="text-md text-gray-800">
+                                            {eventDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </div>
+                                    </div>
+                                    <div className="text-gray-500 text-sm mb-2">
+                                        {daysDiff >= 0 ? `Začne se čez ${daysDiff} dni` : 'Dogodek je potekel'}
+                                    </div>
+                                    <Link
+                                        to={`/events/${event.id}`}
+                                        className="inline-block bg-[#363636] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#444] text-center mt-2"
+                                    >
+                                        Več informacij
+                                    </Link>
                                 </div>
-                                <Link
-                                    to={`/events/${event.id}`}
-                                    className="inline-block bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-                                >
-                                    Več informacij
-                                </Link>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
         </>
