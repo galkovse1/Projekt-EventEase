@@ -75,6 +75,58 @@ const EventList = () => {
             </Helmet>
             <div className="w-full min-h-screen bg-[#f7f7fa] px-4 py-12">
                 <h1 className="text-4xl font-bold text-gray-900 mb-10 text-center tracking-tight">Dogodki</h1>
+                <div className="w-full max-w-5xl mx-auto mb-10 flex flex-col md:flex-row md:items-end gap-4 md:gap-6 justify-center">
+                    <div className="flex-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Iskanje po naslovu</label>
+                        <input
+                            type="text"
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                            placeholder="Išči po naslovu ..."
+                            className="w-full rounded-xl border border-gray-300 bg-white p-3 text-base placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636] text-gray-900"
+                        />
+                    </div>
+                    <div className="flex-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Lokacija</label>
+                        <input
+                            type="text"
+                            value={location}
+                            onChange={e => setLocation(e.target.value)}
+                            placeholder="Išči po lokaciji ..."
+                            className="w-full rounded-xl border border-gray-300 bg-white p-3 text-base placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636] text-gray-900"
+                        />
+                    </div>
+                    <div className="flex-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Datum</label>
+                        <input
+                            type="date"
+                            value={date}
+                            onChange={e => setDate(e.target.value)}
+                            className="w-full rounded-xl border border-gray-300 bg-white p-3 text-base placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636] text-gray-900"
+                        />
+                    </div>
+                    <div className="flex-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Organizator</label>
+                        <input
+                            type="text"
+                            value={organizer}
+                            onChange={e => setOrganizer(e.target.value)}
+                            placeholder="Išči po organizatorju ..."
+                            className="w-full rounded-xl border border-gray-300 bg-white p-3 text-base placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636] text-gray-900"
+                        />
+                    </div>
+                    <div className="flex-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Prikaz</label>
+                        <select
+                            value={onlyMine ? 'mine' : 'all'}
+                            onChange={e => setOnlyMine(e.target.value === 'mine')}
+                            className="w-full rounded-xl border border-gray-300 bg-white p-3 text-base text-gray-900 focus:border-[#363636] focus:ring-2 focus:ring-[#363636]"
+                        >
+                            <option value="all">Vsi dogodki</option>
+                            <option value="mine">Samo moji dogodki</option>
+                        </select>
+                    </div>
+                </div>
                 <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 justify-items-center">
                     {events.map((event) => {
                         const eventDate = new Date(event.dateTime);
