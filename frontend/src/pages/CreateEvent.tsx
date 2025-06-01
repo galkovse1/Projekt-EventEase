@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
+import { Helmet } from 'react-helmet-async';
 
 type UserType = {
     auth0Id: string;
@@ -13,6 +14,10 @@ type UserType = {
 const CreateEvent = () => {
     const navigate = useNavigate();
     const { getAccessTokenSilently } = useAuth0();
+
+    useEffect(() => {
+        document.title = 'Nov dogodek | EventEase';
+    }, []);
 
     const [formData, setFormData] = useState({
         title: '',
@@ -32,6 +37,8 @@ const CreateEvent = () => {
     const [multiDateMode, setMultiDateMode] = useState(false);
     const [multipleDates, setMultipleDates] = useState<string[]>([]);
     const [newDateInput, setNewDateInput] = useState('');
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const [uploading, setUploading] = useState(false);
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -160,6 +167,9 @@ const CreateEvent = () => {
 
     return (
         <div className="w-full min-h-screen bg-gray-100 px-4 py-8 flex justify-center items-start">
+            <Helmet>
+                <title>Nov dogodek | EventEase</title>
+            </Helmet>
             <div className="bg-white shadow rounded-lg p-8 w-full max-w-md">
                 <h1 className="text-3xl font-bold text-gray-900 mb-6">Nov dogodek</h1>
                 {error && (
@@ -185,7 +195,7 @@ const CreateEvent = () => {
                                 checked={multiDateMode}
                                 onChange={(e) => setMultiDateMode(e.target.checked)}
                             />
-                            <span>Omogoči več možnih datumov (glasovanje)</span>
+                            <span className="text-gray-900">Omogoči več možnih datumov (glasovanje)</span>
                         </label>
                     </div>
 
@@ -252,8 +262,51 @@ const CreateEvent = () => {
                     </div>
 
                     <div>
-                        <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700">URL slike</label>
-                        <input type="url" id="imageUrl" name="imageUrl" value={formData.imageUrl} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
+                        <div className="mt-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Naloži sliko dogodka</label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                ref={fileInputRef}
+                                onChange={async (e) => {
+                                    if (!e.target.files || e.target.files.length === 0) return;
+                                    setUploading(true);
+                                    const file = e.target.files[0];
+                                    const data = new FormData();
+                                    data.append('image', file);
+                                    try {
+                                        const token = await getAccessTokenSilently();
+                                        const res = await fetch('http://localhost:5000/api/events/upload-image', {
+                                            method: 'POST',
+                                            headers: { Authorization: `Bearer ${token}` },
+                                            body: data
+                                        });
+                                        const result = await res.json();
+                                        setFormData(f => ({ ...f, imageUrl: result.url }));
+                                    } catch {
+                                        alert('Napaka pri uploadu slike!');
+                                    } finally {
+                                        setUploading(false);
+                                    }
+                                }}
+                                className="border p-2 rounded w-full"
+                                disabled={uploading}
+                            />
+                            {uploading && <div className="text-xs text-gray-500 mt-1">Nalaganje slike ...</div>}
+                            {formData.imageUrl && (
+                                <div className="relative mt-2 w-20 h-20">
+                                    <img src={formData.imageUrl} alt="Predogled" className="w-20 h-20 object-cover rounded border" />
+                                    <button
+                                        type="button"
+                                        onClick={() => setFormData(f => ({ ...f, imageUrl: '' }))}
+                                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center shadow hover:bg-red-700"
+                                        title="Odstrani sliko"
+                                    >
+                                        &times;
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     <div>

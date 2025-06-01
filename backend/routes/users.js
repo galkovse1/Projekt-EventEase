@@ -3,6 +3,7 @@ const router = express.Router();
 const checkJwt = require('../middleware/auth');
 const User = require('../models/User');
 const { Op } = require('sequelize');
+const { upload, uploadImage } = require('../controllers/uploadController');
 
 // 🔎 Iskanje uporabnikov po imenu ali priimku – BREZ AVTENTIKACIJE
 router.get('/search', async (req, res) => {
@@ -80,5 +81,8 @@ router.get('/:id', async (req, res) => {
   if (!user) return res.status(404).json({ error: 'Uporabnik ne obstaja' });
   res.json(user);
 });
+
+// Dodaj upload endpoint
+router.post('/upload-image', upload.single('image'), uploadImage);
 
 module.exports = router;

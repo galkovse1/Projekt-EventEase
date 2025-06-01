@@ -37,12 +37,20 @@ const Navbar = () => {
                                 </button>
                             </div>
                         ) : (
-                            <button
-                                onClick={() => loginWithRedirect()}
-                                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-                            >
-                                Prijava
-                            </button>
+                            <>
+                                <button
+                                    onClick={() => loginWithRedirect()}
+                                    className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 mr-2"
+                                >
+                                    Prijava
+                                </button>
+                                <button
+                                    onClick={() => loginWithRedirect({ authorizationParams: { screen_hint: 'signup' } })}
+                                    className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+                                >
+                                    Registracija
+                                </button>
+                            </>
                         )}
                     </div>
                 </div>

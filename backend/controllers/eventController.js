@@ -286,6 +286,17 @@ const setFinalDate = async (req, res) => {
   res.json({ message: 'Končni datum izbran' });
 };
 
+// Brisanje glasu za termin
+const deleteVoteForDate = async (req, res) => {
+  const userId = req.auth.payload.sub;
+  const { dateOptionId } = req.params;
+
+  const existingVote = await DateVote.findOne({ where: { userId, dateOptionId } });
+  if (!existingVote) return res.status(404).json({ error: 'Glas ni najden' });
+
+  await existingVote.destroy();
+  res.json({ message: 'Glas izbrisan' });
+};
 
 module.exports = {
   getAllEvents,
@@ -296,5 +307,6 @@ module.exports = {
   getVisibleEvents,
   createDateOptions,
   voteForDate,
-  setFinalDate
+  setFinalDate,
+  deleteVoteForDate
 };

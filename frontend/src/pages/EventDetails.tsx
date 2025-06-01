@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
+import { Helmet } from 'react-helmet-async';
 
 interface Event {
     id: string;
@@ -55,6 +56,10 @@ const EventDetails = () => {
         fetchEvent();
         fetchSignups();
     }, [id]);
+
+    useEffect(() => {
+        document.title = event ? `Dogodek: ${event.title} | EventEase` : 'Dogodek | EventEase';
+    }, [event]);
 
     const fetchEvent = async () => {
         try {
@@ -164,6 +169,21 @@ const EventDetails = () => {
         }
     };
 
+    const deleteVote = async (dateOptionId: string) => {
+        try {
+            const token = await getAccessTokenSilently();
+            await fetch(`http://localhost:5000/api/events/vote/${dateOptionId}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            fetchEvent();
+        } catch {
+            console.error('Napaka pri brisanju glasu');
+        }
+    };
+
     const handleSignupChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setSignupData(prev => ({ ...prev, [name]: value }));
@@ -234,6 +254,9 @@ const EventDetails = () => {
 
     return (
         <div className="w-full min-h-screen bg-gray-100 px-4 py-8 flex justify-center items-start">
+            <Helmet>
+                <title>{event ? `Dogodek: ${event.title} | EventEase` : 'Dogodek | EventEase'}</title>
+            </Helmet>
             <div className="w-full max-w-xl bg-white shadow rounded-lg p-6">
                 {event.imageUrl && <img src={event.imageUrl} alt={event.title} className="w-full h-64 object-cover rounded mb-4" />}
                 {isOwner && !isEditing && (
@@ -262,19 +285,19 @@ const EventDetails = () => {
                     </form>
                 ) : (
                     <>
-                        <h1 className="text-3xl font-bold mb-2">{event.title}</h1>
-                        <p className="mb-2">{event.description}</p>
-                        <p className="text-gray-600 mb-2">Datum: {new Date(event.dateTime).toLocaleString()}</p>
-                        <p className="text-gray-600 mb-2">Lokacija: {event.location}</p>
-                        <p className="mb-2"><strong>Vidnost:</strong> {event.visibility === 'public' ? 'Javen' : event.visibility === 'private' ? 'Zaseben' : 'Izbrani uporabniki'}</p>
+                        <h1 className="text-3xl font-bold mb-2 text-gray-900">{event.title}</h1>
+                        <p className="mb-2 text-gray-900">{event.description}</p>
+                        <p className="text-gray-700 mb-2">Datum: {new Date(event.dateTime).toLocaleString()}</p>
+                        <p className="text-gray-700 mb-2">Lokacija: {event.location}</p>
+                        <p className="mb-2 text-gray-700"><strong>Vidnost:</strong> {event.visibility === 'public' ? 'Javen' : event.visibility === 'private' ? 'Zaseben' : 'Izbrani uporabniki'}</p>
 
-                        {dateOptions.length > 0 && (
+                        {(dateOptions || []).length > 0 && (
                             <div className="mb-4">
-                                <h3 className="font-semibold text-gray-800 mb-2">Možni termini:</h3>
+                                <h3 className="font-semibold text-gray-900 mb-2">Možni termini:</h3>
                                 <ul className="space-y-2">
-                                    {dateOptions.map(option => (
-                                        <li key={option.id} className="flex justify-between items-center border p-2 rounded">
-                                            <span>
+                                    {(dateOptions || []).map(option => (
+                                        <li key={option.id} className="flex justify-between items-center border p-2 rounded bg-white">
+                                            <span className="text-gray-900">
                                                 {new Date(option.dateOption).toLocaleString()}
                                                 {option.isFinal && <span className="ml-2 text-green-600 font-semibold">(Izbran)</span>}
                                                 {!option.isFinal && (
@@ -285,8 +308,10 @@ const EventDetails = () => {
                                             </span>
                                             {!option.isFinal && (
                                                 <div className="flex gap-2">
-                                                    {user && !option.votes?.some(v => v.userId === user.sub) && (
-                                                        <button onClick={() => vote(option.id)} className="bg-blue-500 text-white px-2 py-1 rounded text-sm hover:bg-blue-600">Glasuj</button>
+                                                    {user && (
+                                                        option.votes?.some(v => v.userId === user.sub)
+                                                            ? <button onClick={() => deleteVote(option.id)} className="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600">Zbriši glas</button>
+                                                            : <button onClick={() => vote(option.id)} className="bg-blue-500 text-white px-2 py-1 rounded text-sm hover:bg-blue-600">Glasuj</button>
                                                     )}
                                                     {isOwner && (
                                                         <button onClick={() => setAsFinal(option.id)} className="bg-green-600 text-white px-2 py-1 rounded text-sm hover:bg-green-700">Nastavi kot končni</button>
@@ -320,15 +345,15 @@ const EventDetails = () => {
                         )}
 
                         {event.allowSignup && (
-                            <div className="mb-4 text-gray-700">Prijavljeni: {signups.length}{event.maxSignups ? ` / ${event.maxSignups}` : ''}</div>
+                            <div className="mb-4 text-gray-900">Prijavljeni: {signups.length}{event.maxSignups ? ` / ${event.maxSignups}` : ''}</div>
                         )}
 
                         {isOwner && signups.length > 0 && (
                             <div className="mb-4">
-                                <h3 className="font-semibold mb-2 text-gray-700">Prijavljeni:</h3>
+                                <h3 className="font-semibold mb-2 text-gray-900">Prijavljeni:</h3>
                                 <ul className="list-disc pl-5">
                                     {signups.map(s => (
-                                        <li key={s.id} className="text-gray-700 flex items-center justify-between">
+                                        <li key={s.id} className="text-gray-900 flex items-center justify-between">
                                             <span>{s.name} {s.surname} ({s.age} let)</span>
                                             <button
                                                 onClick={() => handleOwnerRemoveSignup(s.userId)}

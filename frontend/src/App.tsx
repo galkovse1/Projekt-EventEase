@@ -9,6 +9,7 @@ import CreateEvent from './pages/CreateEvent';
 import EventDetails from './pages/EventDetails';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useEffect } from 'react';
+import { HelmetProvider } from 'react-helmet-async';
 
 function App() {
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
@@ -29,22 +30,24 @@ function App() {
   }, [isAuthenticated, getAccessTokenSilently]);
 
   return (
-    <Auth0Provider {...auth0Config}>
-      <Router>
-        <div className="min-h-screen bg-gray-100">
-          <Navbar />
-          <main className="w-full px-4 py-8">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/events" element={<EventList />} />
-              <Route path="/events/create" element={<CreateEvent />} />
-              <Route path="/events/:id" element={<EventDetails />} />
-            </Routes>
-          </main>
-        </div>
-      </Router>
-    </Auth0Provider>
+    <HelmetProvider>
+      <Auth0Provider {...auth0Config}>
+        <Router>
+          <div className="min-h-screen bg-gray-100">
+            <Navbar />
+            <main className="w-full px-4 py-8">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/events" element={<EventList />} />
+                <Route path="/events/create" element={<CreateEvent />} />
+                <Route path="/events/:id" element={<EventDetails />} />
+              </Routes>
+            </main>
+          </div>
+        </Router>
+      </Auth0Provider>
+    </HelmetProvider>
   );
 }
 

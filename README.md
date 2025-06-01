@@ -91,6 +91,10 @@ npm run dev
      npm install sequelize
      npm install express-oauth2-jwt-bearer
      npm install nodemon --save-dev
+     npm install cloudinary # 2024-05-11: dodano za upload slik (Cloudinary)
+     npm install multer # 2024-05-11: dodano za upload slik
+     npm install multer-storage-cloudinary # 2024-05-11: dodano za upload slik (ni nujno, če ne uporabljaš direktno)
+     npm install streamifier # 2024-05-11: dodano za upload slik (stream upload)
      ```
 
 2. **Frontend ne deluje:**
@@ -105,6 +109,7 @@ npm run dev
      npm install tailwindcss postcss autoprefixer
      npm install @vitejs/plugin-react
      npm install typescript
+     npm install react-helmet-async # 2024-05-11: dinamičen naslov zavihka (SPA)
      ```
 
 3. **Če imate težave z namestitvijo:**

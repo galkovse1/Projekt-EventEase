@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "cloudinary": "^1.41.3",
+    "multer": "^2.0.0",
+    "multer-storage-cloudinary": "^4.0.0",
+    "react-helmet": "^6.1.0",
+    "react-helmet-async": "^2.0.5"
+  },
+  "devDependencies": {
+    "@types/react-helmet": "^6.1.11"
+  }
+}
