@@ -286,53 +286,87 @@ const Profile = () => {
                 </div>
                 <div className="bg-white shadow-2xl rounded-3xl p-12">
                     <style>{`
-                        .fc .fc-button, .fc .fc-button-primary {
-                            background: #363636 !important;
-                            color: #fff !important;
-                            border: none !important;
-                            border-radius: 0.75rem !important;
-                            box-shadow: none !important;
-                            transition: background 0.2s;
-                        }
-                        .fc .fc-button:hover, .fc .fc-button-primary:hover {
-                            background: #444 !important;
-                            color: #fff !important;
-                        }
-                        .fc .fc-button.fc-button-active, .fc .fc-button-primary.fc-button-active {
-                            background: #222 !important;
-                            color: #fff !important;
-                        }
-                        .fc .fc-button:focus {
-                            outline: 2px solid #363636 !important;
-                            box-shadow: 0 0 0 2px #36363633 !important;
-                        }
-                        .fc .fc-col-header-cell-cushion, .fc .fc-daygrid-day-number {
-                            color: #363636 !important;
-                            font-weight: 500;
-                        }
-                        .fc .fc-event, .fc .fc-event-title, .fc .fc-daygrid-event-dot {
-                            background: none !important;
-                            color: #363636 !important;
-                            border: none !important;
-                            font-weight: 500;
-                        }
-                        .fc .fc-daygrid-event-dot {
-                            background: #363636 !important;
-                        }
-                        .fc .fc-more-link {
-                            color: #363636 !important;
-                            font-weight: 500;
-                        }
-                    `}</style>
+        .fc .fc-button, .fc .fc-button-primary {
+            background: #363636 !important;
+            color: #fff !important;
+            border: none !important;
+            border-radius: 0.75rem !important;
+            box-shadow: none !important;
+            transition: background 0.2s;
+        }
+        .fc .fc-button:hover, .fc .fc-button-primary:hover {
+            background: #444 !important;
+            color: #fff !important;
+        }
+        .fc .fc-button.fc-button-active, .fc .fc-button-primary.fc-button-active {
+            background: #222 !important;
+            color: #fff !important;
+        }
+        .fc .fc-button:focus {
+            outline: 2px solid #363636 !important;
+            box-shadow: 0 0 0 2px #36363633 !important;
+        }
+        .fc .fc-col-header-cell-cushion, .fc .fc-daygrid-day-number {
+            color: #363636 !important;
+            font-weight: 500;
+        }
+        .fc .fc-event, .fc .fc-event-title, .fc .fc-daygrid-event-dot {
+            background: none !important;
+            color: #363636 !important;
+            border: none !important;
+            font-weight: 500;
+        }
+        .fc .fc-daygrid-event-dot {
+            background: #363636 !important;
+        }
+        .fc .fc-more-link {
+            color: #363636 !important;
+            font-weight: 500;
+        }
+    `}</style>
+
+                    {/* 🔘 Filter gumbi */}
+                    <div className="mb-6 flex justify-center gap-4">
+                        <button
+                            onClick={() => setFilter('all')}
+                            className={`px-4 py-2 rounded-xl font-semibold transition-colors ${
+                                filter === 'all' ? 'bg-[#363636] text-white' : 'bg-gray-200 text-gray-800'
+                            }`}
+                        >
+                            Vsi dogodki
+                        </button>
+                        <button
+                            onClick={() => setFilter('created')}
+                            className={`px-4 py-2 rounded-xl font-semibold transition-colors ${
+                                filter === 'created' ? 'bg-[#363636] text-white' : 'bg-gray-200 text-gray-800'
+                            }`}
+                        >
+                            Moji dogodki
+                        </button>
+                        <button
+                            onClick={() => setFilter('registered')}
+                            className={`px-4 py-2 rounded-xl font-semibold transition-colors ${
+                                filter === 'registered' ? 'bg-[#363636] text-white' : 'bg-gray-200 text-gray-800'
+                            }`}
+                        >
+                            Prijavljeni
+                        </button>
+                    </div>
+
+                    {/* 📅 Koledar */}
                     <div className="rounded-2xl shadow-lg overflow-hidden">
                         <FullCalendar
                             plugins={[dayGridPlugin]}
                             initialView="dayGridMonth"
                             events={filteredEvents.map(e => ({
+                                id: e.id, // Pomembno za navigacijo
                                 title: e.title,
                                 date: e.dateTime,
                                 color: e.registered ? '#6366f1' : '#60a5fa',
                             }))}
+                            eventClick={(info) => {
+                                navigate(`/events/${info.event.id}`);
+                            }}
                             locale={slLocale}
                             height={700}
                             contentHeight={700}
