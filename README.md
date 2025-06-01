@@ -168,13 +168,15 @@ npm run dev
 ### 12.Klik na datum → skok na dogodek 
   - V koledarju bo omogočen klik na datum, ki bo uporabnika preusmeril na podrobnosti dogodka.
 
-## Načrtovane funkcionalnosti in izboljšave(kaj še pride)
-
-
-- **Nalaganje slik (Cloudinary)**  
+### 13.Nalaganje slik (Cloudinary)
   Uporabniki bodo lahko naložili profilne slike in slike za dogodke preko storitve Cloudinary.
   
-- **Dodana funkcionalnost polla za odločabje datuma(če kreator zbere to opcijo)**  
+### 14.Dodana funkcionalnost polla za odločabje datuma(če kreator zbere to opcijo)
+
+### 15.
+
+## Načrtovane funkcionalnosti in izboljšave(kaj še pride)
+
 
 - **Izboljšan uporabniški vmesnik profila**  
   Vizualna prenova in več možnosti za urejanje uporabniškega profila.
