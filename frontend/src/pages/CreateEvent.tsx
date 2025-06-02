@@ -40,6 +40,10 @@ const CreateEvent = () => {
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [uploading, setUploading] = useState(false);
     const [dragActive, setDragActive] = useState(false);
+    const dateInputRef = useRef<HTMLInputElement | null>(null);
+    const newDateInputRef = useRef<HTMLInputElement | null>(null);
+
+
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -286,12 +290,18 @@ const CreateEvent = () => {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Dodaj možni datum</label>
                                 <div className="flex gap-2">
-                                    <input
-                                        type="datetime-local"
-                                        value={newDateInput}
-                                        onChange={(e) => setNewDateInput(e.target.value)}
-                                        className="mt-1 block w-full rounded-xl border border-gray-300 bg-white p-3 text-base text-gray-900 placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636]"
-                                    />
+                                    <div
+                                        onClick={() => newDateInputRef.current?.showPicker?.()}
+                                        className="mt-1 w-full rounded-xl border border-gray-300 bg-white p-3 text-base text-gray-900 placeholder-gray-400 focus-within:ring-2 focus-within:ring-[#363636] cursor-pointer"
+                                    >
+                                        <input
+                                            ref={newDateInputRef}
+                                            type="datetime-local"
+                                            value={newDateInput}
+                                            onChange={(e) => setNewDateInput(e.target.value)}
+                                            className="w-full outline-none bg-transparent cursor-pointer"
+                                        />
+                                    </div>
                                     <button
                                         type="button"
                                         onClick={() => {
@@ -327,15 +337,22 @@ const CreateEvent = () => {
                     ) : (
                         <div>
                             <label htmlFor="dateTime" className="block text-base font-medium text-gray-700 mb-1">Datum in čas</label>
-                            <input
-                                type="datetime-local"
-                                id="dateTime"
-                                name="dateTime"
-                                value={formData.dateTime}
-                                onChange={handleChange}
-                                className="mt-1 block w-full rounded-xl border border-gray-300 bg-white p-3 text-base text-gray-900 placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636]"
-                            />
+                            <div
+                                onClick={() => dateInputRef.current?.showPicker?.()}
+                                className="mt-1 w-full rounded-xl border border-gray-300 bg-white p-3 text-base text-gray-900 placeholder-gray-400 focus-within:ring-2 focus-within:ring-[#363636] cursor-pointer"
+                            >
+                                <input
+                                    ref={dateInputRef}
+                                    type="datetime-local"
+                                    id="dateTime"
+                                    name="dateTime"
+                                    value={formData.dateTime}
+                                    onChange={handleChange}
+                                    className="w-full outline-none bg-transparent cursor-pointer"
+                                />
+                            </div>
                         </div>
+
                     )}
 
                     <div>
