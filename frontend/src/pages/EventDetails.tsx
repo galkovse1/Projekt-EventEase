@@ -38,7 +38,7 @@ interface Signup {
 const EventDetails = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { user, getAccessTokenSilently, isLoading } = useAuth0();
+    const { user, getAccessTokenSilently, isLoading, loginWithRedirect } = useAuth0();
 
     const [event, setEvent] = useState<Event | null>(null);
     const [dateOptions, setDateOptions] = useState<Event["dateOptions"]>([]);
@@ -326,6 +326,15 @@ const EventDetails = () => {
                             </div>
                         )}
 
+                        {/* PRIJAVA NA DOGODEK */}
+                        {event.allowSignup && !user && (
+                            <button
+                                onClick={() => loginWithRedirect()}
+                                className="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 mb-6 w-full max-w-xs mx-auto block"
+                            >
+                                Prijavi se
+                            </button>
+                        )}
                         {user && canSignup && !showSignupForm && !isSignedUp && (
                             <button onClick={() => setShowSignupForm(true)} className="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 mb-6 w-full max-w-xs mx-auto block">Prijavi se</button>
                         )}

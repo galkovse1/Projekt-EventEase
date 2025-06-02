@@ -260,15 +260,15 @@ const CreateEvent = () => {
                     </div>
                     <div>
                         <label htmlFor="location" className="block text-base font-medium text-gray-700 mb-1">Lokacija</label>
-                        <input type="text" id="location" name="location" value={formData.location} onChange={handleChange} className="mt-1 block w-full rounded-xl border border-gray-300 bg-white p-3 text-base placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636]" placeholder="Lokacija" />
+                        <input type="text" id="location" name="location" value={formData.location} onChange={handleChange} className="mt-1 block w-full rounded-xl border border-gray-300 bg-white p-3 text-base text-gray-900 placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636]" placeholder="Lokacija" />
                     </div>
                     <div>
                         <label htmlFor="title" className="block text-base font-medium text-gray-700 mb-1">Naslov</label>
-                        <input type="text" id="title" name="title" value={formData.title} onChange={handleChange} className="mt-1 block w-full rounded-xl border border-gray-300 bg-white p-3 text-base placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636]" placeholder="Vnesi naslov dogodka" />
+                        <input type="text" id="title" name="title" value={formData.title} onChange={handleChange} className="mt-1 block w-full rounded-xl border border-gray-300 bg-white p-3 text-base text-gray-900 placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636]" placeholder="Vnesi naslov dogodka" />
                     </div>
                     <div>
                         <label htmlFor="description" className="block text-base font-medium text-gray-700 mb-1">Opis</label>
-                        <textarea id="description" name="description" value={formData.description} onChange={handleChange} rows={4} className="mt-1 block w-full rounded-xl border border-gray-300 bg-white p-3 text-base placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636]" placeholder="Dodaj opis dogodka" />
+                        <textarea id="description" name="description" value={formData.description} onChange={handleChange} rows={4} className="mt-1 block w-full rounded-xl border border-gray-300 bg-white p-3 text-base text-gray-900 placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636]" placeholder="Dodaj opis dogodka" />
                     </div>
                     <div className="mb-4">
                         <label className="flex items-center space-x-2">
@@ -290,7 +290,7 @@ const CreateEvent = () => {
                                         type="datetime-local"
                                         value={newDateInput}
                                         onChange={(e) => setNewDateInput(e.target.value)}
-                                        className="mt-1 block w-full rounded-xl border border-gray-300 bg-white p-3 text-base placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636]"
+                                        className="mt-1 block w-full rounded-xl border border-gray-300 bg-white p-3 text-base text-gray-900 placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636]"
                                     />
                                     <button
                                         type="button"
@@ -333,14 +333,14 @@ const CreateEvent = () => {
                                 name="dateTime"
                                 value={formData.dateTime}
                                 onChange={handleChange}
-                                className="mt-1 block w-full rounded-xl border border-gray-300 bg-white p-3 text-base placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636]"
+                                className="mt-1 block w-full rounded-xl border border-gray-300 bg-white p-3 text-base text-gray-900 placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636]"
                             />
                         </div>
                     )}
 
                     <div>
                         <label htmlFor="visibility" className="block text-base font-medium text-gray-700 mb-1">Vidnost dogodka</label>
-                        <select id="visibility" name="visibility" value={formData.visibility} onChange={handleChange} className="mt-1 block w-full rounded-xl border border-gray-300 bg-white p-3 text-base placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636]">
+                        <select id="visibility" name="visibility" value={formData.visibility} onChange={handleChange} className="mt-1 block w-full rounded-xl border border-gray-300 bg-white p-3 text-base text-gray-900 placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636]">
                             <option value="private">Zasebno (samo jaz)</option>
                             <option value="public">Javno (vsi)</option>
                             <option value="selected">Izbrani uporabniki</option>
@@ -350,7 +350,7 @@ const CreateEvent = () => {
                     {formData.visibility === 'selected' && (
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Dodaj uporabnike</label>
-                            <input type="text" value={searchQuery} onChange={handleSearchChange} placeholder="Išči po imenu..." className="mt-1 block w-full rounded-xl border border-gray-300 bg-white p-3 text-base placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636]" />
+                            <input type="text" value={searchQuery} onChange={handleSearchChange} placeholder="Išči po imenu..." className="mt-1 block w-full rounded-xl border border-gray-300 bg-white p-3 text-base text-gray-900 placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636]" />
                             <ul className="mt-2">
                                 {searchResults.map(user => (
                                     <li key={user.auth0Id} className="cursor-pointer hover:bg-gray-100 px-2 py-1" onClick={() => addUser(user)}>
@@ -377,7 +377,7 @@ const CreateEvent = () => {
                     {formData.allowSignup && (
                         <div>
                             <label htmlFor="maxSignups" className="block text-base font-medium text-gray-700 mb-1">Maksimalno število prijav (pusti prazno za neomejeno)</label>
-                            <input type="number" id="maxSignups" name="maxSignups" min="1" value={formData.maxSignups} onChange={handleChange} className="mt-1 block w-full rounded-xl border border-gray-300 bg-white p-3 text-base placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636]" />
+                            <input type="number" id="maxSignups" name="maxSignups" min="1" value={formData.maxSignups} onChange={handleChange} className="mt-1 block w-full rounded-xl border border-gray-300 bg-white p-3 text-base text-gray-900 placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636]" />
                         </div>
                     )}
 

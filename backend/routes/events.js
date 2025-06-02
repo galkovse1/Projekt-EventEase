@@ -13,9 +13,10 @@ const {
 } = require('../controllers/eventController');
 const checkJwt = require('../middleware/auth');
 const { upload, uploadImage } = require('../controllers/uploadController');
+const optionalAuth = require('../middleware/optionalAuth');
 
 // Public & protected
-router.get('/visible', checkJwt, getVisibleEvents); // MORA biti pred :id
+router.get('/visible', optionalAuth, getVisibleEvents);
 router.get('/', getAllEvents);
 router.get('/:id', getEventById);
 
