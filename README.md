@@ -33,13 +33,16 @@ npm install
 ```env
 # Baza podatkov
 DB_NAME=event_planner
-DB_USER=root ---spremni če je drugačen pri tebi
-DB_PASSWORD= --spremni če je drugačen pri tebi
-DB_HOST=127.0.0.1 --spremni če je drugačen pri tebi
-DB_PORT=3306 --spremni če je drugačen pri tebi
-AUTH0_ISSUER_BASE_URL=https://dev-r12pt12nxl2304iz.us.auth0.com
-AUTH0_AUDIENCE=https://dev-r12pt12nxl2304iz.us.auth0.com/api/v2/
-AUTH0_CLIENT_ID=Uzt64YhWzB0XVnYhxjyG31HOJG0rNaNU
+DB_USER=root ---spremeni če je drugačen pri tebi
+DB_PASSWORD= --spremeni če je drugačen pri tebi
+DB_HOST=127.0.0.1 --spremeni če je drugačen pri tebi
+DB_PORT=3306 --spremeni če je drugačen pri tebi
+AUTH0_ISSUER_BASE_URL=https://dev-dshshd.....
+AUTH0_AUDIENCE=https://
+AUTH0_CLIENT_ID=Uhdnfdikdn....
+CLOUDINARY_CLOUD_NAME=dfdfd...
+CLOUDINARY_PUBLIC_KEY=7613434....
+CLOUDINARY_SECRET_KEY=kghsdwhnj....
 ```
 
 4. Zaženite backend:
@@ -63,9 +66,9 @@ npm install
 Vsak mora v mapi `frontend` ustvariti datoteko `.env` z naslednjo vsebino:
 
 ```
-VITE_AUTH0_DOMAIN=dev-r12pt12nxl2304iz.us.auth0.com
-VITE_AUTH0_CLIENT_ID=Uzt64YhWzB0XVnYhxjyG31HOJG0rNaNU
-VITE_AUTH0_AUDIENCE=https://dev-r12pt12nxl2304iz.us.auth0.com/api/v2/
+VITE_AUTH0_DOMAIN=fdfdfdf.......com
+VITE_AUTH0_CLIENT_ID=Uzt6.........
+VITE_AUTH0_AUDIENCE=https://dev-r1233fftt....
 ```
 
 Datoteka `.env` naj bo dodana v `.gitignore` in naj se NE deli javno ali preko gita.
