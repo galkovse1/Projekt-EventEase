@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Helmet } from 'react-helmet-async';
@@ -28,6 +28,7 @@ const EventList = () => {
     const [date, setDate] = useState('');
     const [organizer, setOrganizer] = useState('');
     const [onlyMine, setOnlyMine] = useState(false);
+    const dateInputRef = useRef<HTMLInputElement | null>(null);
 
     useEffect(() => {
         const fetchEvents = async () => {
@@ -98,12 +99,18 @@ const EventList = () => {
                     </div>
                     <div className="flex-1">
                         <label className="block text-sm font-medium text-gray-700 mb-1">Datum</label>
-                        <input
-                            type="date"
-                            value={date}
-                            onChange={e => setDate(e.target.value)}
-                            className="w-full rounded-xl border border-gray-300 bg-white p-3 text-base placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636] text-gray-900"
-                        />
+                        <div
+                            onClick={() => dateInputRef.current?.showPicker?.()}
+                            className="w-full rounded-xl border border-gray-300 bg-white p-3 text-base text-gray-900 placeholder-gray-400 focus-within:ring-2 focus-within:ring-[#363636] cursor-pointer"
+                        >
+                            <input
+                                ref={dateInputRef}
+                                type="date"
+                                value={date}
+                                onChange={e => setDate(e.target.value)}
+                                className="w-full outline-none bg-transparent cursor-pointer"
+                            />
+                        </div>
                     </div>
                     <div className="flex-1">
                         <label className="block text-sm font-medium text-gray-700 mb-1">Organizator</label>
