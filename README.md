@@ -162,27 +162,24 @@ npm run dev
 ### 10. E-mail opomniki  
  - Uporabniki bodo prejeli opomnike po e-pošti za bližajoče se dogodke.
 
-### 11.Filtriranje dogodkov 
+### 11. Filtriranje dogodkov 
  - Dodana bo možnost filtriranja dogodkov po datumu, tipu, ustvarjalcu ipd.
 
-### 12.Klik na datum → skok na dogodek 
+### 12. Klik na datum → skok na dogodek 
   - V koledarju bo omogočen klik na datum, ki bo uporabnika preusmeril na podrobnosti dogodka.
 
-### 13.Nalaganje slik (Cloudinary)
+### 13. Nalaganje slik (Cloudinary)
   Uporabniki bodo lahko naložili profilne slike in slike za dogodke preko storitve Cloudinary.
   
-### 14.Dodana funkcionalnost polla za odločabje datuma(če kreator zbere to opcijo)
+### 14. Dodana funkcionalnost polla za odločabje datuma(če kreator zbere to opcijo)
 
-### 15.
-
-## Načrtovane funkcionalnosti in izboljšave(kaj še pride)
-
-
-- **Izboljšan uporabniški vmesnik profila**  
+### 15. Izboljšan uporabniški vmesnik profila 
   Vizualna prenova in več možnosti za urejanje uporabniškega profila.
 
-- **Splošna vizualna prenova (frontend)**  
+### 16. Splošna vizualna prenova (frontend) 
   Celoten vmesnik bo grafično izboljšan z boljšim UX/UI dizajnom.
+
+## Načrtovane funkcionalnosti in izboljšave(kaj še pride)
 
 - **Deploy backend aplikacije**  
   Načrtovana objava backend strežnika preko Render ali Railway.
