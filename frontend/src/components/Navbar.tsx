@@ -29,13 +29,13 @@ const Navbar = () => {
   return (
     <>
       {/* Hamburger gumb - prikazan samo na mobilnih napravah */}
-      <button
+        <button
         className="fixed top-4 right-4 z-50 md:hidden bg-[#363636] text-white p-3 rounded-lg shadow-lg focus:outline-none"
         onClick={() => setMobileOpen(true)}
         aria-label="Odpri meni"
-      >
+        >
         <FaBars size={24} />
-      </button>
+        </button>
       {/* Navbar za večje zaslone in mobile overlay */}
       <aside
         className={`
@@ -50,66 +50,66 @@ const Navbar = () => {
           <span className="text-2xl font-bold tracking-wide text-center">
             EventEase
           </span>
-        </div>
-        {!isAuthenticated && (
-          <div className="flex flex-col gap-2 mt-6 px-2">
-            <button
-              onClick={() => loginWithRedirect()}
-              className={`flex items-center gap-3 px-2 py-3 rounded-lg text-lg font-medium transition-colors w-full border-2 border-white text-white hover:bg-white hover:text-[#363636] bg-transparent`}
-              title="Prijava"
-              style={{ color: 'white', background: 'none' }}
-            >
-              <FaSignInAlt className="text-xl" style={{ color: 'white' }} />
+      </div>
+      {!isAuthenticated && (
+        <div className="flex flex-col gap-2 mt-6 px-2">
+          <button
+            onClick={() => loginWithRedirect()}
+            className={`flex items-center gap-3 px-2 py-3 rounded-lg text-lg font-medium transition-colors w-full border-2 border-white text-white hover:bg-white hover:text-[#363636] bg-transparent`}
+            title="Prijava"
+            style={{ color: 'white', background: 'none' }}
+          >
+            <FaSignInAlt className="text-xl" style={{ color: 'white' }} />
               Prijava
-            </button>
-            <button
-              onClick={() => loginWithRedirect({ authorizationParams: { screen_hint: 'signup' } })}
-              className={`flex items-center gap-3 px-2 py-3 rounded-lg text-lg font-medium transition-colors w-full border-2 border-white text-white hover:bg-white hover:text-[#363636] bg-transparent`}
-              title="Registracija"
-              style={{ color: 'white', background: 'none' }}
-            >
-              <FaUserPlus className="text-xl" style={{ color: 'white' }} />
+          </button>
+          <button
+            onClick={() => loginWithRedirect({ authorizationParams: { screen_hint: 'signup' } })}
+            className={`flex items-center gap-3 px-2 py-3 rounded-lg text-lg font-medium transition-colors w-full border-2 border-white text-white hover:bg-white hover:text-[#363636] bg-transparent`}
+            title="Registracija"
+            style={{ color: 'white', background: 'none' }}
+          >
+            <FaUserPlus className="text-xl" style={{ color: 'white' }} />
               Registracija
-            </button>
-          </div>
-        )}
-        <nav className="flex flex-col gap-2 mt-6 px-2">
-          {navLinks.map(link => {
-            const isActive = location.pathname === link.to;
-            return (
-              (link.to === '/profile' || link.to === '/events/create') && !isAuthenticated ? (
-                <button
-                  key={link.to}
-                  onClick={() => loginWithRedirect()}
+          </button>
+        </div>
+      )}
+      <nav className="flex flex-col gap-2 mt-6 px-2">
+        {navLinks.map(link => {
+          const isActive = location.pathname === link.to;
+          return (
+            (link.to === '/profile' || link.to === '/events/create') && !isAuthenticated ? (
+              <button
+                key={link.to}
+                onClick={() => loginWithRedirect()}
                   className={`flex items-center gap-3 px-2 py-3 rounded-lg text-lg font-medium transition-colors w-full hover:bg-[#444]`}
-                  title={link.label}
-                  style={{ color: 'white', background: 'none' }}
-                >
-                  <span className="text-xl" style={{ color: 'white' }}>{link.icon}</span>
+                title={link.label}
+                style={{ color: 'white', background: 'none' }}
+              >
+                <span className="text-xl" style={{ color: 'white' }}>{link.icon}</span>
                   <span style={{ color: 'white' }}>{link.label}</span>
-                </button>
-              ) : (
-                <Link
-                  key={link.to}
-                  to={link.to}
+              </button>
+            ) : (
+              <Link
+                key={link.to}
+                to={link.to}
                   className={`flex items-center gap-3 px-2 py-3 rounded-lg text-lg font-medium transition-colors ${isActive ? 'bg-[#444]' : 'hover:bg-[#444]'}`}
-                  title={link.label}
-                  style={{ color: 'white' }}
-                >
-                  <span className="text-xl" style={{ color: 'white' }}>{link.icon}</span>
+                title={link.label}
+                style={{ color: 'white' }}
+              >
+                <span className="text-xl" style={{ color: 'white' }}>{link.icon}</span>
                   <span style={{ color: 'white' }}>{link.label}</span>
-                </Link>
-              )
-            );
-          })}
-          {isAuthenticated && (
-            <button
-              onClick={() => logout()}
-              className="flex items-center gap-3 px-2 py-3 rounded-lg text-lg font-medium bg-red-600 hover:bg-red-700 transition-colors w-full"
-              title="Odjava"
-              style={{ color: 'white' }}
-            >
-              <FaSignOutAlt className="text-xl" style={{ color: 'white' }} />
+              </Link>
+            )
+          );
+        })}
+        {isAuthenticated && (
+          <button
+            onClick={() => logout()}
+            className="flex items-center gap-3 px-2 py-3 rounded-lg text-lg font-medium bg-red-600 hover:bg-red-700 transition-colors w-full"
+            title="Odjava"
+            style={{ color: 'white' }}
+          >
+            <FaSignOutAlt className="text-xl" style={{ color: 'white' }} />
               Odjava
             </button>
           )}
@@ -194,10 +194,10 @@ const Navbar = () => {
                 >
                   <FaSignOutAlt className="text-xl" style={{ color: 'white' }} />
                   Odjava
-                </button>
-              )}
-            </nav>
-          </aside>
+          </button>
+        )}
+      </nav>
+    </aside>
         </div>
       )}
     </>

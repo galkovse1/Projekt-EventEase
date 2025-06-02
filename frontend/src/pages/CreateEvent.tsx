@@ -370,14 +370,14 @@ const CreateEvent = () => {
                             <input type="text" value={searchQuery} onChange={handleSearchChange} placeholder="Išči po imenu..." className="mt-1 block w-full rounded-xl border border-gray-300 bg-white p-3 text-base text-gray-900 placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636]" />
                             <ul className="mt-2">
                                 {searchResults.map(user => (
-                                    <li key={user.auth0Id} className="cursor-pointer hover:bg-gray-100 px-2 py-1" onClick={() => addUser(user)}>
+                                    <li key={user.auth0Id} className="cursor-pointer hover:bg-gray-100 px-2 py-1 text-gray-900" onClick={() => addUser(user)}>
                                         {user.name} {user.surname} ({user.email})
                                     </li>
                                 ))}
                             </ul>
                             <div className="mt-2">
                                 {selectedUsers.map(user => (
-                                    <span key={user.auth0Id} className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm mr-2 mb-2">
+                                    <span key={user.auth0Id} className="inline-block bg-gray-100 text-gray-900 px-2 py-1 rounded-full text-sm mr-2 mb-2">
                                         {user.name} {user.surname}
                                         <button type="button" className="ml-1 text-red-500" onClick={() => removeUser(user.auth0Id)}>×</button>
                                     </span>

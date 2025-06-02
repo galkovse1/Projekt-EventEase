@@ -4,7 +4,7 @@ const { Op } = require('sequelize');
 
 const signupToEvent = async (req, res) => {
     const { eventId } = req.params;
-    const { name, surname, age, userId } = req.body;
+    const { name, surname, age, userId, email } = req.body;
 
     const event = await Event.findByPk(eventId);
     if (!event || !event.allowSignup) {
@@ -27,7 +27,15 @@ const signupToEvent = async (req, res) => {
         }
     }
 
-    const newSignup = await EventSignup.create({ eventId, name, surname, age, userId });
+    // Prepreči večkratno prijavo z istim emailom (če je email podan)
+    if (email) {
+        const obstajaEmail = await EventSignup.findOne({ where: { eventId, email } });
+        if (obstajaEmail) {
+            return res.status(409).json({ error: 'Ta email je že prijavljen na ta dogodek' });
+        }
+    }
+
+    const newSignup = await EventSignup.create({ eventId, name, surname, age, userId, email });
     res.status(201).json(newSignup);
 };
 

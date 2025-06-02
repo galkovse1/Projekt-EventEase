@@ -23,6 +23,10 @@ const EventSignup = sequelize.define('EventSignup', {
         type: DataTypes.STRING,
         allowNull: true // Lahko je null, če je prijava brez uporabniškega računa
     },
+    email: {
+        type: DataTypes.STRING,
+        allowNull: true // Lahko je null, če je prijava brez računa
+    },
     eventId: {
         type: DataTypes.UUID,
         allowNull: false
