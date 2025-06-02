@@ -74,9 +74,9 @@ const EventList = () => {
             <Helmet>
                 <title>Dogodki | EventEase</title>
             </Helmet>
-            <div className="w-full min-h-screen bg-[#f7f7fa] px-4 py-12">
+            <div className="w-full min-h-screen bg-[#f7f7fa] px-4 py-16">
                 <h1 className="text-4xl font-bold text-gray-900 mb-10 text-center tracking-tight">Dogodki</h1>
-                <div className="w-full max-w-5xl mx-auto mb-10 flex flex-col md:flex-row md:items-end gap-4 md:gap-6 justify-center">
+                <div className="w-full mx-auto mb-10 flex flex-col md:flex-row md:items-end gap-4 md:gap-6 justify-center">
                     <div className="flex-1">
                         <label className="block text-sm font-medium text-gray-700 mb-1">Iskanje po naslovu</label>
                         <input
@@ -134,7 +134,7 @@ const EventList = () => {
                         </select>
                     </div>
                 </div>
-                <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 justify-items-center">
+                <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 justify-items-center place-items-center">
                     {events.map((event) => {
                         const eventDate = new Date(event.dateTime);
                         const now = new Date();

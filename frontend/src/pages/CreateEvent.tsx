@@ -171,11 +171,11 @@ const CreateEvent = () => {
 
 
     return (
-        <div className="w-full min-h-screen bg-[#f7f7fa] px-4 py-12 flex justify-center items-start">
+        <div className="w-full min-h-screen bg-[#f7f7fa] px-4 py-12 flex flex-col items-center justify-center">
             <Helmet>
                 <title>Ustvari dogodek | EventEase</title>
             </Helmet>
-            <div className="bg-white shadow-2xl rounded-3xl p-12 w-full max-w-lg flex flex-col items-center">
+            <div className="bg-white shadow-2xl rounded-3xl p-12 w-full max-w-full md:max-w-[calc(100vw-16rem)] lg:max-w-lg flex flex-col items-center mx-auto">
                 <h1 className="text-4xl font-semibold text-gray-900 mb-10 text-center">Ustvari dogodek</h1>
                 {error && (
                     <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 w-full text-center">

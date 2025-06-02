@@ -30,25 +30,23 @@ function App() {
     createUserIfNeeded();
   }, [isAuthenticated, getAccessTokenSilently]);
 
-  // Dynamic padding for main
-  const { mini } = useContext(NavbarContext);
-  const mainPadding = mini ? 'pr-20' : 'pr-64';
-
   return (
     <HelmetProvider>
       <Auth0Provider {...auth0Config}>
         <NavbarProvider>
           <Router>
-            <div className="min-h-screen bg-gray-100">
+            <div className="min-h-screen bg-gray-100 flex flex-col md:flex-row">
               <Navbar />
-              <main className={`w-full px-4 py-8 transition-all duration-300 ${mainPadding}`}>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/events" element={<EventList />} />
-                  <Route path="/events/create" element={<CreateEvent />} />
-                  <Route path="/events/:id" element={<EventDetails />} />
-                </Routes>
+              <main className="flex-1 flex flex-col items-center justify-start px-2 py-8 md:mr-64 w-full min-h-screen">
+                <div className="w-full max-w-full md:max-w-[calc(100vw-16rem)] 2xl:max-w-7xl mx-auto">
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/events" element={<EventList />} />
+                    <Route path="/events/create" element={<CreateEvent />} />
+                    <Route path="/events/:id" element={<EventDetails />} />
+                  </Routes>
+                </div>
               </main>
             </div>
           </Router>

@@ -169,11 +169,11 @@ const Profile = () => {
     if (!profile) return <div>Nalaganje...</div>;
 
     return (
-        <div className="w-full min-h-screen bg-[#f7f7fa] px-4 py-12 flex justify-center items-start">
+        <div className="w-full min-h-screen bg-[#f7f7fa] px-4 py-12 flex flex-col items-center justify-start">
             <Helmet>
                 <title>Profil | EventEase</title>
             </Helmet>
-            <div className="w-full max-w-5xl mx-auto">
+            <div className="w-full max-w-full md:max-w-[calc(100vw-16rem)] 2xl:max-w-7xl mx-auto">
                 <div className="flex flex-col items-center">
                     <div className="w-48 h-48 mb-6">
                         {edit ? (
