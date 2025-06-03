@@ -262,7 +262,13 @@ const Profile = () => {
                 </div>
                 <div className="bg-white shadow-2xl rounded-3xl p-16 mb-12 relative flex flex-col items-center">
                     {!edit && (
-                        <button onClick={() => setEdit(true)} type="button" className="absolute top-6 right-6 bg-[#363636] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#444] text-lg">Uredi profil</button>
+                        <button
+                            onClick={() => setEdit(true)}
+                            type="button"
+                            className="md:absolute md:top-6 md:right-6 bg-[#363636] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#444] text-lg md:self-auto self-center mt-2 md:mt-0 text-base px-4 py-2"
+                        >
+                            Uredi profil
+                        </button>
                     )}
                     {edit ? (
                         <form className="flex flex-col items-center space-y-6 w-full max-w-lg">
@@ -270,10 +276,19 @@ const Profile = () => {
                             <input type="text" placeholder="Priimek" value={form.surname} onChange={e => setForm(f => ({ ...f, surname: e.target.value }))} className="border border-gray-300 bg-white p-3 rounded-xl w-full text-lg placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636] text-gray-900" disabled={!edit} />
                             <input type="email" placeholder="Email" value={profile?.email || user?.email || ''} disabled className="border border-gray-200 bg-gray-100 p-3 rounded-xl w-full text-lg placeholder-gray-400 text-gray-900" />
                             <textarea placeholder="Bio" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} className="border border-gray-300 bg-white p-3 rounded-xl w-full text-lg placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636] text-gray-900" disabled={!edit} />
+                            <label className="flex items-center space-x-2 w-full">
+                                <input
+                                    type="checkbox"
+                                    checked={form.wantsNotifications}
+                                    onChange={e => setForm(f => ({ ...f, wantsNotifications: e.target.checked }))}
+                                    className="h-5 w-5 text-[#363636] border-gray-300 rounded"
+                                />
+                                <span className="text-base text-gray-900">Želim prejemati obvestila o dogodkih</span>
+                            </label>
                             <button onClick={handleSave} type="button" className="bg-[#363636] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#444] w-full text-lg">Shrani</button>
                         </form>
                     ) : (
-                        <div className="flex flex-col items-center w-full max-w-lg space-y-4">
+                        <div className="flex flex-col items-center w-full max-w-lg space-y-4 mt-4 md:mt-0">
                             <div className="w-full flex flex-col items-center">
                                 <div className="text-3xl font-bold text-gray-900 mb-1">{form.name} {form.surname}</div>
                                 <div className="text-lg text-gray-600 mb-2">{profile?.email || user?.email || ''}</div>

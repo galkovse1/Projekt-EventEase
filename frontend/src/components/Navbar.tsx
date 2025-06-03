@@ -1,7 +1,7 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { Link, useLocation } from 'react-router-dom';
 import { FaCalendarAlt, FaUser, FaPlusSquare, FaSignOutAlt, FaSignInAlt, FaUserPlus, FaBars, FaTimes } from 'react-icons/fa';
-import { useState, createContext, useContext } from 'react';
+import { useState, createContext } from 'react';
 
 const navLinks = [
   { to: '/events', label: 'Dogodki', icon: <FaCalendarAlt /> },
@@ -59,7 +59,7 @@ const Navbar = () => {
             title="Prijava"
             style={{ color: 'white', background: 'none' }}
           >
-            <FaSignInAlt className="text-xl" style={{ color: 'white' }} />
+            <FaSignInAlt size={24} color="white" />
               Prijava
           </button>
           <button
@@ -68,7 +68,7 @@ const Navbar = () => {
             title="Registracija"
             style={{ color: 'white', background: 'none' }}
           >
-            <FaUserPlus className="text-xl" style={{ color: 'white' }} />
+            <FaUserPlus size={24} color="white" />
               Registracija
           </button>
         </div>
@@ -109,7 +109,7 @@ const Navbar = () => {
             title="Odjava"
             style={{ color: 'white' }}
           >
-            <FaSignOutAlt className="text-xl" style={{ color: 'white' }} />
+            <FaSignOutAlt size={24} color="white" />
               Odjava
             </button>
           )}
@@ -141,7 +141,7 @@ const Navbar = () => {
                   title="Prijava"
                   style={{ color: 'white', background: 'none' }}
                 >
-                  <FaSignInAlt className="text-xl" style={{ color: 'white' }} />
+                  <FaSignInAlt size={24} color="white" />
                   Prijava
                 </button>
                 <button
@@ -150,7 +150,7 @@ const Navbar = () => {
                   title="Registracija"
                   style={{ color: 'white', background: 'none' }}
                 >
-                  <FaUserPlus className="text-xl" style={{ color: 'white' }} />
+                  <FaUserPlus size={24} color="white" />
                   Registracija
                 </button>
               </div>
@@ -192,12 +192,12 @@ const Navbar = () => {
                   title="Odjava"
                   style={{ color: 'white' }}
                 >
-                  <FaSignOutAlt className="text-xl" style={{ color: 'white' }} />
+                  <FaSignOutAlt size={24} color="white" />
                   Odjava
-          </button>
-        )}
-      </nav>
-    </aside>
+                </button>
+              )}
+            </nav>
+          </aside>
         </div>
       )}
     </>

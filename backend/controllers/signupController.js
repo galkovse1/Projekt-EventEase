@@ -6,6 +6,8 @@ const signupToEvent = async (req, res) => {
     const { eventId } = req.params;
     const { name, surname, age, userId, email } = req.body;
 
+    console.log('eventId:', eventId, 'userId:', userId, 'email:', email);
+
     const event = await Event.findByPk(eventId);
     if (!event || !event.allowSignup) {
         return res.status(403).json({ error: 'Prijava ni dovoljena' });
