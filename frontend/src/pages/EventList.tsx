@@ -17,6 +17,11 @@ interface Event {
         surname?: string;
         picture?: string;
     };
+    dateOptions?: {
+        id: string;
+        dateOption: string;
+        isFinal: boolean;
+    }[];
 }
 
 const EventList = () => {
@@ -139,6 +144,24 @@ const EventList = () => {
                         const eventDate = new Date(event.dateTime);
                         const now = new Date();
                         const daysDiff = Math.ceil((eventDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                        let eventDateLabel: string;
+                        let eventTimeLabel: string;
+
+                        if (event.dateOptions && event.dateOptions.length > 1) {
+                            const final = event.dateOptions.find(opt => opt.isFinal);
+                            if (final) {
+                                const finalDate = new Date(final.dateOption);
+                                eventDateLabel = finalDate.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+                                eventTimeLabel = finalDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                            } else {
+                                eventDateLabel = 'Možnost izbire datuma';
+                                eventTimeLabel = '';
+                            }
+                        } else {
+                            const d = new Date(event.dateTime);
+                            eventDateLabel = d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+                            eventTimeLabel = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        }
                         return (
                             <div key={event.id} className="bg-white rounded-3xl shadow-xl overflow-hidden w-full max-w-xs flex flex-col transition-transform hover:scale-105 hover:shadow-2xl duration-200">
                                 {event.imageUrl && (
@@ -151,16 +174,24 @@ const EventList = () => {
                                 <div className="p-6 flex flex-col flex-1 justify-between items-center text-center">
                                     <h2 className="text-2xl font-extrabold text-gray-900 mb-2">{event.title}</h2>
                                     <div className="mb-2">
-                                        <div className="text-lg font-bold text-gray-900">
-                                            {eventDate.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
-                                        </div>
-                                        <div className="text-md text-gray-800">
-                                            {eventDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                        </div>
+                                        {eventDateLabel === 'Možnost izbire datuma' ? (
+                                            <Link to={`/events/${event.id}`} className="text-sm text-gray-500 italic hover:underline">
+                                                Možnost izbire datuma
+                                            </Link>
+                                        ) : (
+                                            <>
+                                                <div className="text-lg font-bold text-gray-900">{eventDateLabel}</div>
+                                                {eventTimeLabel && (
+                                                    <div className="text-md text-gray-800">{eventTimeLabel}</div>
+                                                )}
+                                            </>
+                                        )}
                                     </div>
-                                    <div className="text-gray-500 text-sm mb-2">
-                                        {daysDiff >= 0 ? `Začne se čez ${daysDiff} dni` : 'Dogodek je potekel'}
-                                    </div>
+                                    {eventDateLabel !== 'Možnost izbire datuma' && (
+                                        <div className="text-gray-500 text-sm mb-2">
+                                            {daysDiff >= 0 ? `Začne se čez ${daysDiff} dni` : 'Dogodek je potekel'}
+                                        </div>
+                                    )}
                                     <Link
                                         to={`/events/${event.id}`}
                                         className="inline-block bg-[#363636] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#444] text-center mt-2"
