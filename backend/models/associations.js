@@ -18,6 +18,9 @@ Event.belongsTo(User, { foreignKey: 'ownerId', targetKey: 'auth0Id', as: 'User' 
 Event.hasMany(EventSignup, { foreignKey: 'eventId', as: 'EventSignups' });
 EventSignup.belongsTo(Event, { foreignKey: 'eventId', as: 'Event' });
 
+EventSignup.belongsTo(User, { foreignKey: 'userId', as: 'User' });
+User.hasMany(EventSignup, { foreignKey: 'userId' });
+
 // Many-to-many: Event <-> User (vidnost za "selected")
 Event.belongsToMany(User, {
     through: EventVisibility,
