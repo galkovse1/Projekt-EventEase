@@ -7,6 +7,7 @@ const EventSignup = require('./models/EventSignup');
 const eventRoutes = require('./routes/events');
 const userRoutes = require('./routes/users');
 const signupRoutes = require('./routes/signups');
+const runReminderJob = require('./reminderScheduler');
 
 require('./models/associations');
 
@@ -30,7 +31,8 @@ sequelize.authenticate()
   })
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`🚀 Server posluša na http://localhost:${PORT}`);
+        setInterval(runReminderJob, 60 * 1000); // ⏱️ Kliči vsakih 60 sekund
+        console.log(`🚀 Server posluša na http://localhost:${PORT}`);
     });
   })
   .catch(err => {
