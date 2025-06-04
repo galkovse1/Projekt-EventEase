@@ -2,9 +2,11 @@ const { Op, Sequelize } = require('sequelize');
 const Event = require('../models/Event');
 const User = require('../models/User');
 const EventVisibility = require('../models/EventVisibility');
-const { sendEventNotification } = require('../utils/emailService');
+const { sendCreationConfirmation } = require('../utils/emailService');
 const EventDateOption = require('../models/EventDateOption');
 const DateVote = require('../models/DateVote');
+const axios = require('axios');
+
 
 const getAllEvents = async (req, res) => {
   const events = await Event.findAll({
@@ -48,9 +50,25 @@ const getEventById = async (req, res) => {
 const createEvent = async (req, res) => {
   try {
     const auth0Id = req.auth.payload.sub;
-    const { name, email, picture } = req.auth.payload;
+    let { name, email, picture } = req.auth.payload;
 
-    // Poišči ali ustvari uporabnika
+
+    if (!email) {
+      try {
+        const token = req.headers.authorization.split(' ')[1];
+        const userinfoRes = await axios.get('https://dev-r12pt12nxl2304iz.us.auth0.com/userinfo', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const info = userinfoRes.data;
+        name = info.name;
+        email = info.email;
+        picture = info.picture;
+        console.log(`✅ Email pridobljen iz /userinfo: ${email}`);
+      } catch (err) {
+        console.warn('⚠️ Neuspešen klic /userinfo:', err.response?.data || err.message);
+      }
+    }
+
     let user = await User.findByPk(auth0Id);
     if (!user) {
       user = await User.create({
@@ -58,8 +76,12 @@ const createEvent = async (req, res) => {
         name: name || '',
         email: email || '',
         picture: picture || '',
-        wantsNotifications: false // privzeto
+        wantsNotifications: false
       });
+    } else if (!user.email && email) {
+      user.email = email;
+      await user.save();
+      console.log(`📬 Email shranjen za uporabnika ${auth0Id}: ${email}`);
     }
 
     const {
@@ -87,7 +109,7 @@ const createEvent = async (req, res) => {
       ownerId: auth0Id
     });
 
-    // Če je vidnost izbrana, shrani, komu je dogodek viden
+    // Shrani EventVisibility (če je treba)
     if (visibility === 'selected' && Array.isArray(visibleTo)) {
       const records = visibleTo.map(userId => ({
         EventId: newEvent.id,
@@ -96,18 +118,19 @@ const createEvent = async (req, res) => {
       await EventVisibility.bulkCreate(records);
     }
 
-    // ✅ Pošlji email, če uporabnik želi obvestila
-    if (user.wantsNotifications && user.email) {
-      console.log(`📧 Pošiljam email na ${user.email} ...`);
+// ✅ Pošlji potrditveni email ustvarjalcu dogodka – vedno (če ima email)
+    if (user.email) {
+      console.log(`📧 Pošiljam potrditveni email na ${user.email} ...`);
       try {
-        await sendEventNotification(user.email, newEvent);
-        console.log(`✅ Email uspešno poslan.`);
+        await sendCreationConfirmation(user.email, newEvent);
+        console.log(`✅ Email poslan.`);
       } catch (emailErr) {
-        console.error(`❌ Napaka pri pošiljanju emaila:`, emailErr);
+        console.error(`❌ Napaka pri pošiljanju potrditve:`, emailErr);
       }
     } else {
-      console.log(`ℹ️ Uporabnik ne želi prejemati obvestil ali nima e-pošte.`);
+      console.warn(`⚠️ Uporabnik nima e-pošte: ${user.auth0Id}`);
     }
+
 
     res.status(201).json(newEvent);
   } catch (err) {
