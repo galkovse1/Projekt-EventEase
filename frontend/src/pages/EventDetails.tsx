@@ -67,7 +67,12 @@ const EventDetails = () => {
 
     const fetchEvent = async () => {
         try {
-            const res = await fetch(`http://localhost:5000/api/events/${id}`);
+            const token = await getAccessTokenSilently(); // 🔐 Pridobi JWT
+            const res = await fetch(`http://localhost:5000/api/events/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
             if (!res.ok) throw new Error('Napaka pri pridobivanju dogodka');
             const data = await res.json();
             setEvent(data);
@@ -338,7 +343,14 @@ const EventDetails = () => {
                         <h1 className="text-4xl font-extrabold mb-4 text-gray-900 text-center">{event.title}</h1>
                         <p className="mb-4 text-gray-800 text-center text-lg">{event.description}</p>
                         <div className="flex flex-col md:flex-row md:justify-between gap-2 mb-4 text-gray-700 text-base">
-                            <span><strong>Datum:</strong> {new Date(event.dateTime).toLocaleString()}</span>
+                            <span>
+                                <strong>Datum:</strong>{' '}
+                                {dateOptions && dateOptions.length > 1
+                                    ? (dateOptions.some(opt => opt.isFinal)
+                                        ? new Date(event.dateTime).toLocaleString()
+                                        : 'Možnost izbire')
+                                    : new Date(event.dateTime).toLocaleString()}
+                            </span>
                             <span><strong>Lokacija:</strong> {event.location}</span>
                         </div>
                         <p className="mb-4 text-gray-700 text-center"><strong>Vidnost:</strong> {event.visibility === 'public' ? 'Javen' : event.visibility === 'private' ? 'Zaseben' : 'Izbrani uporabniki'}</p>
