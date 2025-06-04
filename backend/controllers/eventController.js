@@ -246,10 +246,16 @@ const getVisibleEvents = async (req, res) => {
           model: User,
           as: 'User',
           attributes: ['auth0Id', 'name', 'surname', 'email', 'picture']
+        },
+        {
+          model: EventDateOption,
+          as: 'dateOptions',
+          attributes: ['id', 'dateOption', 'isFinal']
         }
       ],
       order: [['dateTime', 'ASC']]
     });
+
 
     res.json(events);
   } catch (err) {
