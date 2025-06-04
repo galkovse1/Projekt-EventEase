@@ -1,3 +1,4 @@
+const axios = require('axios'); // 🔼 Dodaj na vrh datoteke, če še ni
 const express = require('express');
 const router = express.Router();
 const checkJwt = require('../middleware/auth');
@@ -5,7 +6,7 @@ const User = require('../models/User');
 const { Op } = require('sequelize');
 const { upload, uploadImage } = require('../controllers/uploadController');
 
-// 🔎 Iskanje uporabnikov po imenu ali priimku – BREZ AVTENTIKACIJE
+// Iskanje uporabnikov po imenu ali priimku – BREZ AVTENTIKACIJE
 router.get('/search', async (req, res) => {
   const query = req.query.query;
 
@@ -31,32 +32,53 @@ router.get('/search', async (req, res) => {
   }
 });
 
-// ✅ Vsi spodnji route-i zahtevajo prijavo
+
 router.use(checkJwt);
 
-// 🔐 Pridobi svoj profil
+// Pridobi svoj profil
 router.get('/profile', async (req, res) => {
-  let user = await User.findByPk(req.auth.payload.sub);
+  const auth0Id = req.auth.payload.sub;
+  let email = req.auth.payload.email || '';
+  let picture = req.auth.payload.picture || '';
+
+  // Če ni emaila, pridobi prek Auth0 /userinfo
+  if (!email) {
+    try {
+      const token = req.headers.authorization.split(' ')[1];
+      const response = await axios.get('https://dev-r12pt12nxl2304iz.us.auth0.com/userinfo', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      email = response.data.email || '';
+      picture = response.data.picture || picture;
+
+      console.log(`Email pridobljen iz /userinfo: ${email}`);
+    } catch (err) {
+      console.warn('Napaka pri pridobivanju emaila iz /userinfo:', err.message);
+    }
+  }
+
+  let user = await User.findByPk(auth0Id);
 
   if (!user) {
     user = await User.create({
-      auth0Id: req.auth.payload.sub,
-      email: req.auth.payload.email || '',
+      auth0Id,
+      email,
       name: '',
       surname: '',
-      picture: req.auth.payload.picture || '',
+      picture,
       description: '',
       wantsNotifications: false
     });
-  } else if (!user.email && req.auth.payload.email) {
-    user.email = req.auth.payload.email;
+  } else if (!user.email && email) {
+    user.email = email;
     await user.save();
   }
 
   res.json(user);
 });
 
-// ✏️ Uredi svoj profil
+// Uredi svoj profil
 router.patch('/profile', async (req, res) => {
   const user = await User.findByPk(req.auth.payload.sub);
   if (!user) return res.status(404).json({ error: 'Uporabnik ne obstaja' });
@@ -73,7 +95,7 @@ router.patch('/profile', async (req, res) => {
   res.json(user);
 });
 
-// 🌐 Pridobi javni profil po ID
+// Pridobi javni profil po ID
 router.get('/:id', async (req, res) => {
   const user = await User.findByPk(req.params.id, {
     attributes: ['auth0Id', 'name', 'surname', 'picture', 'description']
