@@ -95,7 +95,10 @@ npm run dev
      npm install multer # 2024-05-11: dodano za upload slik
      npm install multer-storage-cloudinary # 2024-05-11: dodano za upload slik (ni nujno, če ne uporabljaš direktno)
      npm install streamifier # 2024-05-11: dodano za upload slik (stream upload)
-     npx sequelize-cli db:migrate #Migracije baze 
+     npx sequelize-cli db:migrate #Migracije baze
+     npm install node-cron # 2025-06-04
+     npm install nodemailer # 2025-06-04
+     npm install axios # 2025-06-04
      ```
 
 2. **Frontend ne deluje:**
