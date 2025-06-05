@@ -33,6 +33,7 @@ interface Event {
         surname?: string;
         email?: string;
     }[];
+    signupDeadline?: string;
 }
 
 interface Signup {
@@ -373,7 +374,6 @@ const EventDetails = () => {
                     <form onSubmit={handleEditSubmit} className="space-y-6">
                         <input type="text" name="title" value={editData?.title || ''} onChange={handleEditChange} className="w-full border rounded-lg p-3 text-lg" placeholder="Naslov" />
                         <textarea name="description" value={editData?.description || ''} onChange={handleEditChange} className="w-full border rounded-lg p-3 text-lg" placeholder="Opis" />
-                        <input type="datetime-local" name="dateTime" value={editData?.dateTime?.slice(0, 16) || ''} onChange={handleEditChange} className="w-full border rounded-lg p-3 text-lg" />
                         <input type="text" name="location" value={editData?.location || ''} onChange={handleEditChange} className="w-full border rounded-lg p-3 text-lg" placeholder="Lokacija" />
                         <input type="url" name="imageUrl" value={editData?.imageUrl || ''} onChange={handleEditChange} className="w-full border rounded-lg p-3 text-lg" placeholder="URL slike" />
                         <select name="visibility" value={editData?.visibility || 'public'} onChange={handleEditChange} className="w-full border rounded-lg p-3 text-lg">
@@ -407,6 +407,30 @@ const EventDetails = () => {
                                         </span>
                                     ))}
                                 </div>
+                            </div>
+                        )}
+                        <div>
+                            <label htmlFor="dateTime" className="block text-sm font-medium text-gray-700 mb-1">Datum in čas</label>
+                            <input
+                                type="datetime-local"
+                                name="dateTime"
+                                id="dateTime"
+                                value={editData?.dateTime?.slice(0, 16) || ''}
+                                onChange={handleEditChange}
+                                className="w-full border rounded-lg p-3 text-lg"
+                            />
+                        </div>
+                        {editData?.allowSignup && (
+                            <div>
+                                <label htmlFor="signupDeadline" className="block text-sm font-medium text-gray-700 mb-1">Zadnji dan prijave</label>
+                                <input
+                                    type="datetime-local"
+                                    name="signupDeadline"
+                                    value={editData?.signupDeadline ? editData.signupDeadline.slice(0, 16) : ''}
+                                    onChange={handleEditChange}
+                                    className="w-full border rounded-lg p-3 text-lg"
+                                    max={editData?.dateTime ? editData.dateTime.slice(0, 16) : undefined}
+                                />
                             </div>
                         )}
                         <div className="flex gap-4 justify-end">

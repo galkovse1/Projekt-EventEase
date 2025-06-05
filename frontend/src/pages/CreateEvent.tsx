@@ -393,23 +393,6 @@ const CreateEvent = () => {
                                     </span>
                                 ))}
                             </div>
-                            <div className="mt-4">
-                                <label htmlFor="signupDeadline" className="block text-sm font-medium text-gray-700 mb-1">Zadnji dan prijave</label>
-                                <div
-                                    onClick={() => (document.getElementById('signupDeadline') as HTMLInputElement | null)?.showPicker?.()}
-                                    className="mt-1 w-full rounded-xl border border-gray-300 bg-white p-3 text-base text-gray-900 placeholder-gray-400 focus-within:ring-2 focus-within:ring-[#363636] cursor-pointer"
-                                >
-                                    <input
-                                        type="datetime-local"
-                                        id="signupDeadline"
-                                        name="signupDeadline"
-                                        value={signupDeadline}
-                                        onChange={e => setSignupDeadline(e.target.value)}
-                                        className="w-full outline-none bg-transparent cursor-pointer"
-                                        {...(!multiDateMode && formData.dateTime ? { max: formData.dateTime } : {})}
-                                    />
-                                </div>
-                            </div>
                         </div>
                     )}
 
@@ -419,10 +402,29 @@ const CreateEvent = () => {
                     </div>
 
                     {formData.allowSignup && (
+                        <>
                         <div>
                             <label htmlFor="maxSignups" className="block text-base font-medium text-gray-700 mb-1">Maksimalno število prijav (pusti prazno za neomejeno)</label>
                             <input type="number" id="maxSignups" name="maxSignups" min="1" value={formData.maxSignups} onChange={handleChange} className="mt-1 block w-full rounded-xl border border-gray-300 bg-white p-3 text-base text-gray-900 placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636]" />
                         </div>
+                        <div className="mt-4">
+                            <label htmlFor="signupDeadline" className="block text-sm font-medium text-gray-700 mb-1">Zadnji dan prijave</label>
+                            <div
+                                onClick={() => (document.getElementById('signupDeadline') as HTMLInputElement | null)?.showPicker?.()}
+                                className="mt-1 w-full rounded-xl border border-gray-300 bg-white p-3 text-base text-gray-900 placeholder-gray-400 focus-within:ring-2 focus-within:ring-[#363636] cursor-pointer"
+                            >
+                                <input
+                                    type="datetime-local"
+                                    id="signupDeadline"
+                                    name="signupDeadline"
+                                    value={signupDeadline}
+                                    onChange={e => setSignupDeadline(e.target.value)}
+                                    className="w-full outline-none bg-transparent cursor-pointer"
+                                    {...(!multiDateMode && formData.dateTime ? { max: formData.dateTime } : {})}
+                                />
+                            </div>
+                        </div>
+                        </>
                     )}
 
                     <div>

@@ -78,7 +78,8 @@ const createEvent = async (req, res) => {
       allowSignup,
       maxSignups,
       visibility = 'private',
-      visibleTo = []
+      visibleTo = [],
+      signupDeadline
     } = req.body;
 
     // Ustvari dogodek
@@ -91,7 +92,8 @@ const createEvent = async (req, res) => {
       allowSignup,
       maxSignups,
       visibility,
-      ownerId: auth0Id
+      ownerId: auth0Id,
+      signupDeadline
     });
 
     // Shrani EventVisibility (če je treba)
@@ -131,7 +133,7 @@ const updateEvent = async (req, res) => {
     if (!event) return res.status(404).json({ error: 'Dogodek ne obstaja' });
     if (event.ownerId !== auth0Id) return res.status(403).json({ error: 'Nimate dovoljenja za urejanje tega dogodka' });
 
-    const { title, description, dateTime, location, imageUrl, allowSignup, maxSignups, visibility, visibleTo } = req.body;
+    const { title, description, dateTime, location, imageUrl, allowSignup, maxSignups, visibility, visibleTo, signupDeadline } = req.body;
 
     await event.update({
       title,
@@ -141,7 +143,8 @@ const updateEvent = async (req, res) => {
       imageUrl,
       allowSignup,
       maxSignups,
-      visibility
+      visibility,
+      signupDeadline
     });
 
     // Posodobi EventVisibility
