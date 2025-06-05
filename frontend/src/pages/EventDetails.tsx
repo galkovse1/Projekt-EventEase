@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Helmet } from 'react-helmet-async';
 
@@ -26,6 +26,12 @@ interface Event {
         dateOption: string;
         isFinal: boolean;
         votes: { userId: string }[];
+    }[];
+    VisibleToUsers?: {
+        auth0Id: string;
+        name: string;
+        surname?: string;
+        email?: string;
     }[];
 }
 
@@ -56,6 +62,11 @@ const EventDetails = () => {
 
     const [showUserModal, setShowUserModal] = useState(false);
 
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState<any[]>([]);
+    const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
+    const searchInputRef = useRef<HTMLInputElement | null>(null);
+
     useEffect(() => {
         fetchEvent();
         fetchSignups();
@@ -64,6 +75,12 @@ const EventDetails = () => {
     useEffect(() => {
         document.title = event ? `Dogodek: ${event.title} | EventEase` : 'Dogodek | EventEase';
     }, [event]);
+
+    useEffect(() => {
+        if (isEditing && editData?.visibility === 'selected') {
+            setSelectedUsers(editData.VisibleToUsers || []);
+        }
+    }, [isEditing, editData]);
 
     const fetchEvent = async () => {
         try {
@@ -108,18 +125,49 @@ const EventDetails = () => {
         setEditData(prev => prev ? { ...prev, [name]: value } : null);
     };
 
+    const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const query = e.target.value;
+        setSearchQuery(query);
+        if (query.length < 2) {
+            setSearchResults([]);
+            return;
+        }
+        try {
+            const res = await fetch(`http://localhost:5000/api/users/search?query=${encodeURIComponent(query)}`);
+            const data = await res.json();
+            const filtered = data.filter((u: any) => !selectedUsers.some(su => su.auth0Id === u.auth0Id));
+            setSearchResults(filtered);
+        } catch (err) {
+            // ignore
+        }
+    };
+
+    const addUser = (user: any) => {
+        setSelectedUsers(prev => [...prev, user]);
+        setSearchQuery('');
+        setSearchResults([]);
+    };
+
+    const removeUser = (auth0Id: string) => {
+        setSelectedUsers(prev => prev.filter(u => u.auth0Id !== auth0Id));
+    };
+
     const handleEditSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!editData) return;
         try {
             const token = await getAccessTokenSilently();
+            const body: any = { ...editData };
+            if (editData.visibility === 'selected') {
+                body.visibleTo = selectedUsers.map(u => u.auth0Id);
+            }
             const response = await fetch(`http://localhost:5000/api/events/${event?.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify(editData)
+                body: JSON.stringify(body)
             });
             if (!response.ok) throw new Error();
             const updated = await response.json();
@@ -333,6 +381,34 @@ const EventDetails = () => {
                             <option value="private">Zasebno</option>
                             <option value="selected">Izbrani uporabniki</option>
                         </select>
+                        {editData?.visibility === 'selected' && (
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Dodaj uporabnike</label>
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={handleSearchChange}
+                                    placeholder="Išči po imenu..."
+                                    ref={searchInputRef}
+                                    className="mt-1 block w-full rounded-xl border border-gray-300 bg-white p-3 text-base text-gray-900 placeholder-gray-400 focus:border-[#363636] focus:ring-2 focus:ring-[#363636]"
+                                />
+                                <ul className="mt-2">
+                                    {searchResults.map(user => (
+                                        <li key={user.auth0Id} className="cursor-pointer hover:bg-gray-100 px-2 py-1 text-gray-900" onClick={() => addUser(user)}>
+                                            {user.name} {user.surname} ({user.email})
+                                        </li>
+                                    ))}
+                                </ul>
+                                <div className="mt-2">
+                                    {selectedUsers.map(user => (
+                                        <span key={user.auth0Id} className="inline-block bg-gray-100 text-gray-900 px-2 py-1 rounded-full text-sm mr-2 mb-2">
+                                            {user.name} {user.surname}
+                                            <button type="button" className="ml-1 text-red-500" onClick={() => removeUser(user.auth0Id)}>×</button>
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                         <div className="flex gap-4 justify-end">
                             <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors">Shrani</button>
                             <button type="button" onClick={() => setIsEditing(false)} className="bg-gray-400 text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-500 transition-colors">Prekliči</button>

@@ -44,6 +44,10 @@ const Event = sequelize.define('Event', {
         type: DataTypes.ENUM('private', 'public', 'selected'),
         allowNull: false,
         defaultValue: 'private'
+    },
+    signupDeadline: {
+        type: DataTypes.DATE,
+        allowNull: true
     }
 });
 

@@ -8,10 +8,10 @@ const { sendReminderEmail } = require('./utils/emailService');
 const runReminderJob = async () => {
     const now = new Date();
 
-    //const targetTime = new Date(now.getTime() + 60 * 1000); // 1 minuta vnaprej
+    const targetTime = new Date(now.getTime() + 60 * 1000); // 1 minuta vnaprej
 
     // 24 ur vnaprej (točno en dan)
-    const targetTime = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    //const targetTime = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
     const from = new Date(targetTime.getTime() - 30 * 1000);
     const to = new Date(targetTime.getTime() + 30 * 1000);

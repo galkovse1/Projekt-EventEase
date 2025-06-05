@@ -35,6 +35,20 @@ router.get('/search', async (req, res) => {
 
 router.use(checkJwt);
 
+// Funkcija za izluščenje imena in priimka iz emaila
+function parseNameFromEmail(email) {
+  const local = email.split('@')[0];
+  const parts = local.split(/[._-]/);
+  if (parts.length >= 2) {
+    return { name: capitalize(parts[0]), surname: capitalize(parts[1]) };
+  }
+  return { name: capitalize(local), surname: '' };
+}
+
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 // Pridobi svoj profil
 router.get('/profile', async (req, res) => {
   const auth0Id = req.auth.payload.sub;
@@ -61,14 +75,16 @@ router.get('/profile', async (req, res) => {
   let user = await User.findByPk(auth0Id);
 
   if (!user) {
+    // Izlušči ime in priimek iz emaila, če ni podano
+    const parsed = parseNameFromEmail(email);
     user = await User.create({
       auth0Id,
       email,
-      name: '',
-      surname: '',
+      name: parsed.name,
+      surname: parsed.surname,
       picture,
       description: '',
-      wantsNotifications: false
+      wantsNotifications: true
     });
   } else if (!user.email && email) {
     user.email = email;

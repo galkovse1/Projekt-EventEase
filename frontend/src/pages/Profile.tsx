@@ -22,12 +22,13 @@ interface EventData {
     dateTime: string;
     ownerId: string;
     registered?: boolean;
+    visibility: string;
 }
 
 const Profile = () => {
     const { getAccessTokenSilently, isAuthenticated, isLoading, user } = useAuth0();
     const [profile, setProfile] = useState<UserProfile | null>(null);
-    const [form, setForm] = useState({ name: '', surname: '', description: '', picture: '', wantsNotifications: false });
+    const [form, setForm] = useState({ name: '', surname: '', description: '', picture: '', wantsNotifications: true });
     const [edit, setEdit] = useState(false);
     const [error, setError] = useState('');
     const [events, setEvents] = useState<EventData[]>([]);
@@ -85,7 +86,7 @@ const Profile = () => {
                     surname,
                     description: data.description || '',
                     picture,
-                    wantsNotifications: data.wantsNotifications || false
+                    wantsNotifications: data.wantsNotifications !== undefined ? data.wantsNotifications : true
                 });
             } catch {
                 setError('Napaka pri pridobivanju profila');
@@ -157,7 +158,14 @@ const Profile = () => {
             registered: registeredIds.includes(e.id)
         }))
         .filter(event => {
-            if (filter === 'all') return true;
+            if (filter === 'all') {
+                // Prikaži samo public dogodke, moje dogodke in dogodke na katere sem prijavljen
+                return (
+                    event.visibility === 'public' ||
+                    event.ownerId === profile?.auth0Id ||
+                    event.registered
+                );
+            }
             if (filter === 'created') return event.ownerId === profile?.auth0Id;
             if (filter === 'registered') return event.registered;
             return true;

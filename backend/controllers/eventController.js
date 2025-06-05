@@ -20,29 +20,14 @@ const getEventById = async (req, res) => {
   try {
     const event = await Event.findByPk(req.params.id, {
       include: [
-        {
-          model: User,
-          as: 'User',
-          attributes: ['auth0Id', 'name', 'surname', 'email', 'picture']
-        },
-        {
-          model: EventDateOption,
-          as: 'dateOptions', // TOČNO kot v associations.js
-          include: [
-            {
-              model: DateVote,
-              as: 'votes', // TOČNO kot v associations.js
-              attributes: ['userId']
-            }
-          ]
-        }
+        { model: User, as: 'User', attributes: ['auth0Id', 'name', 'surname', 'email', 'picture'] },
+        { model: User, as: 'VisibleToUsers', attributes: ['auth0Id', 'name', 'surname', 'email', 'picture'] },
+        { model: EventDateOption, as: 'dateOptions', attributes: ['id', 'dateOption', 'isFinal'] }
       ]
     });
-
     if (!event) return res.status(404).json({ error: 'Dogodek ne obstaja' });
     res.json(event);
   } catch (err) {
-    console.error('Napaka v getEventById:', err);
     res.status(500).json({ error: 'Napaka pri pridobivanju dogodka' });
   }
 };
@@ -76,7 +61,7 @@ const createEvent = async (req, res) => {
         name: name || '',
         email: email || '',
         picture: picture || '',
-        wantsNotifications: false
+        wantsNotifications: true
       });
     } else if (!user.email && email) {
       user.email = email;
@@ -146,7 +131,7 @@ const updateEvent = async (req, res) => {
     if (!event) return res.status(404).json({ error: 'Dogodek ne obstaja' });
     if (event.ownerId !== auth0Id) return res.status(403).json({ error: 'Nimate dovoljenja za urejanje tega dogodka' });
 
-    const { title, description, dateTime, location, imageUrl, allowSignup, maxSignups, visibility } = req.body;
+    const { title, description, dateTime, location, imageUrl, allowSignup, maxSignups, visibility, visibleTo } = req.body;
 
     await event.update({
       title,
@@ -159,7 +144,24 @@ const updateEvent = async (req, res) => {
       visibility
     });
 
-    res.json(event);
+    // Posodobi EventVisibility
+    if (visibility === 'selected' && Array.isArray(visibleTo)) {
+      await EventVisibility.destroy({ where: { EventId: event.id } });
+      const records = visibleTo.map(userId => ({ EventId: event.id, UserId: userId }));
+      await EventVisibility.bulkCreate(records);
+    } else if (visibility !== 'selected') {
+      await EventVisibility.destroy({ where: { EventId: event.id } });
+    }
+
+    // Vrni posodobljen dogodek z uporabniki
+    const updated = await Event.findByPk(event.id, {
+      include: [
+        { model: User, as: 'User', attributes: ['auth0Id', 'name', 'surname', 'email', 'picture'] },
+        { model: User, as: 'VisibleToUsers', attributes: ['auth0Id', 'name', 'surname', 'email', 'picture'] },
+        { model: EventDateOption, as: 'dateOptions', attributes: ['id', 'dateOption', 'isFinal'] }
+      ]
+    });
+    res.json(updated);
   } catch (err) {
     res.status(500).json({ error: 'Napaka pri posodabljanju dogodka' });
   }

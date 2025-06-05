@@ -42,9 +42,7 @@ const CreateEvent = () => {
     const [dragActive, setDragActive] = useState(false);
     const dateInputRef = useRef<HTMLInputElement | null>(null);
     const newDateInputRef = useRef<HTMLInputElement | null>(null);
-
-
-
+    const [signupDeadline, setSignupDeadline] = useState('');
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
@@ -103,6 +101,17 @@ const CreateEvent = () => {
             return false;
         }
 
+        if (
+            formData.visibility === 'selected' &&
+            !multiDateMode &&
+            signupDeadline &&
+            formData.dateTime &&
+            new Date(signupDeadline) >= new Date(formData.dateTime)
+        ) {
+            setError('Zadnji dan prijave mora biti pred začetkom dogodka!');
+            return false;
+        }
+
         return true;
     };
 
@@ -140,7 +149,8 @@ const CreateEvent = () => {
                     allowSignup,
                     maxSignups: maxSignups ? parseInt(maxSignups) : null,
                     visibility,
-                    visibleTo: selectedUsers.map(u => u.auth0Id)
+                    visibleTo: selectedUsers.map(u => u.auth0Id),
+                    signupDeadline: visibility === 'selected' ? signupDeadline : undefined
                 })
             });
 
@@ -382,6 +392,23 @@ const CreateEvent = () => {
                                         <button type="button" className="ml-1 text-red-500" onClick={() => removeUser(user.auth0Id)}>×</button>
                                     </span>
                                 ))}
+                            </div>
+                            <div className="mt-4">
+                                <label htmlFor="signupDeadline" className="block text-sm font-medium text-gray-700 mb-1">Zadnji dan prijave</label>
+                                <div
+                                    onClick={() => (document.getElementById('signupDeadline') as HTMLInputElement | null)?.showPicker?.()}
+                                    className="mt-1 w-full rounded-xl border border-gray-300 bg-white p-3 text-base text-gray-900 placeholder-gray-400 focus-within:ring-2 focus-within:ring-[#363636] cursor-pointer"
+                                >
+                                    <input
+                                        type="datetime-local"
+                                        id="signupDeadline"
+                                        name="signupDeadline"
+                                        value={signupDeadline}
+                                        onChange={e => setSignupDeadline(e.target.value)}
+                                        className="w-full outline-none bg-transparent cursor-pointer"
+                                        {...(!multiDateMode && formData.dateTime ? { max: formData.dateTime } : {})}
+                                    />
+                                </div>
                             </div>
                         </div>
                     )}
