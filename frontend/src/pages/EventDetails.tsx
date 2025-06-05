@@ -85,12 +85,16 @@ const EventDetails = () => {
 
     const fetchEvent = async () => {
         try {
-            const token = await getAccessTokenSilently(); // 🔐 Pridobi JWT
+            const headers: any = {};
+            if (user) {
+                const token = await getAccessTokenSilently();
+                headers.Authorization = `Bearer ${token}`;
+            }
+
             const res = await fetch(`http://localhost:5000/api/events/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+                headers
             });
+
             if (!res.ok) throw new Error('Napaka pri pridobivanju dogodka');
             const data = await res.json();
             setEvent(data);
@@ -159,9 +163,14 @@ const EventDetails = () => {
         try {
             const token = await getAccessTokenSilently();
             const body: any = { ...editData };
-            if (editData.visibility === 'selected') {
-                body.visibleTo = selectedUsers.map(u => u.auth0Id);
-            }
+
+            const previousIds = event?.VisibleToUsers?.map(u => u.auth0Id) || [];
+            const currentIds = selectedUsers.map(u => u.auth0Id);
+            const newlyAdded = selectedUsers.filter(u => !previousIds.includes(u.auth0Id));
+
+            body.visibleTo = currentIds;
+            body.newlyAddedUsers = newlyAdded.map(u => u.auth0Id);
+
             const response = await fetch(`http://localhost:5000/api/events/${event?.id}`, {
                 method: 'PUT',
                 headers: {
@@ -170,6 +179,7 @@ const EventDetails = () => {
                 },
                 body: JSON.stringify(body)
             });
+
             if (!response.ok) throw new Error();
             const updated = await response.json();
             setEvent(updated);
