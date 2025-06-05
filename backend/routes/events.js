@@ -18,7 +18,7 @@ const optionalAuth = require('../middleware/optionalAuth');
 // Public & protected
 router.get('/visible', optionalAuth, getVisibleEvents);
 router.get('/', getAllEvents);
-router.get('/:id', getEventById);
+router.get('/:id', optionalAuth, getEventById);
 
 // Protected routes
 router.use(checkJwt);

@@ -1,3 +1,4 @@
+const { sendReminderEmail, sendInviteNotification } = require('../utils/emailService');
 const { Op, Sequelize } = require('sequelize');
 const Event = require('../models/Event');
 const User = require('../models/User');
@@ -22,7 +23,16 @@ const getEventById = async (req, res) => {
       include: [
         { model: User, as: 'User', attributes: ['auth0Id', 'name', 'surname', 'email', 'picture'] },
         { model: User, as: 'VisibleToUsers', attributes: ['auth0Id', 'name', 'surname', 'email', 'picture'] },
-        { model: EventDateOption, as: 'dateOptions', attributes: ['id', 'dateOption', 'isFinal'] }
+        {
+          model: EventDateOption,
+          as: 'dateOptions',
+          attributes: ['id', 'dateOption', 'isFinal'],
+          include: [{
+            model: DateVote,
+            as: 'votes',
+            attributes: ['userId'] // dovolj je userId za preverjanje, če je uporabnik že glasoval
+          }]
+        }
       ]
     });
     if (!event) return res.status(404).json({ error: 'Dogodek ne obstaja' });
@@ -93,7 +103,7 @@ const createEvent = async (req, res) => {
       maxSignups,
       visibility,
       ownerId: auth0Id,
-      signupDeadline
+      ...(signupDeadline && signupDeadline !== 'Invalid date' ? { signupDeadline } : {}) // 🛡️ zaščita
     });
 
     // Shrani EventVisibility (če je treba)
@@ -103,6 +113,27 @@ const createEvent = async (req, res) => {
         UserId: userId
       }));
       await EventVisibility.bulkCreate(records);
+
+// ponovno naloži dogodek z vsemi podatki (da bo imel tudi signupDeadline)
+      const eventWithDeadline = await Event.findByPk(newEvent.id);
+
+// pošlji email za vsakega
+      const invitedUsers = await User.findAll({
+        where: { auth0Id: visibleTo },
+        attributes: ['email', 'name', 'wantsNotifications']
+      });
+
+      for (const u of invitedUsers) {
+        if (u.email && u.wantsNotifications) {
+          try {
+            console.log("📬 Email se pošilja z signupDeadline:", eventWithDeadline.signupDeadline);
+            await sendInviteNotification(u.email, u.name, eventWithDeadline);
+            console.log(`📨 Obvestilo poslano na: ${u.email}`);
+          } catch (err) {
+            console.error(`❌ Napaka pri pošiljanju povabila:`, err);
+          }
+        }
+      }
     }
 
 // ✅ Pošlji potrditveni email ustvarjalcu dogodka – vedno (če ima email)
@@ -164,6 +195,27 @@ const updateEvent = async (req, res) => {
         { model: EventDateOption, as: 'dateOptions', attributes: ['id', 'dateOption', 'isFinal'] }
       ]
     });
+    // ⏩ Pošlji obvestila samo novo dodanim uporabnikom (če obstajajo)
+    if (visibility === 'selected' && Array.isArray(req.body.newlyAddedUsers)) {
+      const eventWithDetails = await Event.findByPk(event.id); // pridobi vse podatke
+
+      const newUsers = await User.findAll({
+        where: { auth0Id: req.body.newlyAddedUsers },
+        attributes: ['email', 'name', 'wantsNotifications']
+      });
+
+      for (const u of newUsers) {
+        if (u.email && u.wantsNotifications) {
+          try {
+            await sendInviteNotification(u.email, u.name, eventWithDetails);
+            console.log(`📨 Obvestilo poslano novemu: ${u.email}`);
+          } catch (err) {
+            console.error(`❌ Napaka pri pošiljanju obvestila novemu:`, err);
+          }
+        }
+      }
+    }
+
     res.json(updated);
   } catch (err) {
     res.status(500).json({ error: 'Napaka pri posodabljanju dogodka' });
