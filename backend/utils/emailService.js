@@ -51,7 +51,29 @@ const sendReminderEmail = async (to, event) => {
     });
 };
 
+const sendInviteNotification = async (to, userName, event) => {
+    const deadline = event.signupDeadline
+        ? `<p><strong>Zadnji dan za prijavo:</strong> ${new Date(event.signupDeadline).toLocaleString('sl-SI')}</p>`
+        : `<p><em>Rok za prijavo ni določen.</em></p>`;
+
+    await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to,
+        subject: `Povabilo na dogodek: ${event.title}`,
+        html: `
+            <h2>Bili ste dodani k dogodku: ${event.title}</h2>
+            <p><strong>Kdaj:</strong> ${new Date(event.dateTime).toLocaleString('sl-SI')}</p>
+            <p><strong>Opis:</strong> ${event.description || 'Ni opisa.'}</p>
+            <p><strong>Lokacija:</strong> ${event.location || 'Ni lokacije.'}</p>
+            ${deadline}
+            <br/>
+            <a href="http://localhost:3000/events/${event.id}">Klikni tukaj za ogled dogodka</a>
+        `
+    });
+};
+
 module.exports = {
     sendCreationConfirmation,
-    sendReminderEmail
+    sendReminderEmail,
+    sendInviteNotification
 };
