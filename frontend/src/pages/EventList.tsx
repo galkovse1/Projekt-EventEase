@@ -25,6 +25,7 @@ interface Event {
         isFinal: boolean;
     }[];
 }
+console.log("VITE_BACKEND_URL", API_BASE);
 
 const EventList = () => {
     const { getAccessTokenSilently, user } = useAuth0();
