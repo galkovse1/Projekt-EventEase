@@ -285,9 +285,9 @@ const getVisibleEvents = async (req, res) => {
             { ownerId: auth0Id },
             Sequelize.literal(`
               EXISTS (
-                SELECT 1 FROM EventVisibilities
-                WHERE EventVisibilities.EventId = Event.id
-                AND EventVisibilities.UserId = '${auth0Id}'
+                SELECT 1 FROM "EventVisibilities"
+                WHERE "EventVisibilities"."EventId" = "Event"."id"
+                AND "EventVisibilities"."UserId" = '${auth0Id}'
               )
             `)
           ]
