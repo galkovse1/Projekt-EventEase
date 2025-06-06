@@ -2,6 +2,8 @@ import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Helmet } from 'react-helmet-async';
+const API_BASE = import.meta.env.VITE_BACKEND_URL;
+
 
 interface Event {
     id: string;

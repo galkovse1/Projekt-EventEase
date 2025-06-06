@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Helmet } from 'react-helmet-async';
+const API_BASE = import.meta.env.VITE_BACKEND_URL;
 
 interface Event {
     id: string;
@@ -91,7 +92,7 @@ const EventDetails = () => {
                 headers.Authorization = `Bearer ${token}`;
             }
 
-            const res = await fetch(`http://localhost:5000/api/events/${id}`, {
+            const res = await fetch(`${API_BASE}/api/events/${id}`, {
                 headers
             });
 
@@ -106,7 +107,7 @@ const EventDetails = () => {
 
     const fetchSignups = async () => {
         try {
-            const res = await fetch(`http://localhost:5000/api/signups/${id}`);
+            const res = await fetch(`${API_BASE}/api/signups/${id}`);
             if (!res.ok) return;
             const data = await res.json();
             setSignups(data);
@@ -138,7 +139,7 @@ const EventDetails = () => {
             return;
         }
         try {
-            const res = await fetch(`http://localhost:5000/api/users/search?query=${encodeURIComponent(query)}`);
+            const res = await fetch(`${API_BASE}/api/users/search?query=${encodeURIComponent(query)}`);
             const data = await res.json();
             const filtered = data.filter((u: any) => !selectedUsers.some(su => su.auth0Id === u.auth0Id));
             setSearchResults(filtered);
@@ -171,7 +172,7 @@ const EventDetails = () => {
             body.visibleTo = currentIds;
             body.newlyAddedUsers = newlyAdded.map(u => u.auth0Id);
 
-            const response = await fetch(`http://localhost:5000/api/events/${event?.id}`, {
+            const response = await fetch(`${API_BASE}/api/events/${event?.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -193,7 +194,7 @@ const EventDetails = () => {
         if (!window.confirm('Si prepričan, da želiš izbrisati dogodek?')) return;
         try {
             const token = await getAccessTokenSilently();
-            const res = await fetch(`http://localhost:5000/api/events/${event?.id}`, {
+            const res = await fetch(`${API_BASE}/api/events/${event?.id}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -209,7 +210,7 @@ const EventDetails = () => {
     const vote = async (dateOptionId: string) => {
         try {
             const token = await getAccessTokenSilently();
-            await fetch(`http://localhost:5000/api/events/vote/${dateOptionId}`, {
+            await fetch(`${API_BASE}/api/events/vote/${dateOptionId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -225,7 +226,7 @@ const EventDetails = () => {
     const setAsFinal = async (dateOptionId: string) => {
         try {
             const token = await getAccessTokenSilently();
-            await fetch(`http://localhost:5000/api/events/${event?.id}/final-date/${dateOptionId}`, {
+            await fetch(`${API_BASE}/api/events/${event?.id}/final-date/${dateOptionId}`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -240,7 +241,7 @@ const EventDetails = () => {
     const deleteVote = async (dateOptionId: string) => {
         try {
             const token = await getAccessTokenSilently();
-            await fetch(`http://localhost:5000/api/events/vote/${dateOptionId}`, {
+            await fetch(`${API_BASE}/api/events/vote/${dateOptionId}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -268,7 +269,7 @@ const EventDetails = () => {
         }
 
         try {
-            const res = await fetch(`http://localhost:5000/api/signups/${event?.id}`, {
+            const res = await fetch(`${API_BASE}/api/signups/${event?.id}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -295,7 +296,7 @@ const EventDetails = () => {
     const handleCancelSignup = async () => {
         if (!user) return;
         try {
-            await fetch(`http://localhost:5000/api/signups/${event?.id}/${user.sub}`, {
+            await fetch(`${API_BASE}/api/signups/${event?.id}/${user.sub}`, {
                 method: 'DELETE'
             });
             fetchSignups();
@@ -308,7 +309,7 @@ const EventDetails = () => {
     const handleOwnerRemoveSignup = async (userIdToRemove?: string) => {
         if (!userIdToRemove) return;
         try {
-            await fetch(`http://localhost:5000/api/signups/${event?.id}/${userIdToRemove}`, {
+                await fetch(`${API_BASE}/api/signups/${event?.id}/${userIdToRemove}`, {
                 method: 'DELETE'
             });
             fetchSignups();

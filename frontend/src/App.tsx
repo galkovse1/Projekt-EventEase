@@ -10,7 +10,7 @@ import EventDetails from './pages/EventDetails';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useEffect } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
-
+const API_BASE = import.meta.env.VITE_BACKEND_URL;
 function App() {
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
 
@@ -18,7 +18,7 @@ function App() {
     const createUserIfNeeded = async () => {
       if (isAuthenticated) {
         const token = await getAccessTokenSilently();
-        await fetch('http://localhost:5000/api/users', {
+        await fetch(`${API_BASE}/api/users`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Helmet } from 'react-helmet-async';
 
+const API_BASE = import.meta.env.VITE_BACKEND_URL;
+
 type UserType = {
     auth0Id: string;
     name: string;
@@ -61,7 +63,7 @@ const CreateEvent = () => {
         }
 
         try {
-            const res = await fetch(`http://localhost:5000/api/users/search?query=${encodeURIComponent(query)}`);
+            const res = await fetch(`${API_BASE}/api/users/search?query=${encodeURIComponent(query)}`);
             const data: UserType[] = await res.json();
             const filtered = data.filter(u => !selectedUsers.some(su => su.auth0Id === u.auth0Id));
             setSearchResults(filtered);
@@ -134,7 +136,7 @@ const CreateEvent = () => {
                 visibility
             } = formData;
 
-            const response = await fetch('http://localhost:5000/api/events', {
+            const response = await fetch(`${API_BASE}/api/events`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -162,7 +164,7 @@ const CreateEvent = () => {
 
             // 🔽 Pošlji možnosti datumov, če je omogočeno glasovanje
             if (multiDateMode && multipleDates.length > 0) {
-                await fetch(`http://localhost:5000/api/events/${newEvent.id}/date-options`, {
+                await fetch(`${API_BASE}/api/events/${newEvent.id}/date-options`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -208,7 +210,7 @@ const CreateEvent = () => {
                                 data.append('image', file);
                                 try {
                                     const token = await getAccessTokenSilently();
-                                    const res = await fetch('http://localhost:5000/api/events/upload-image', {
+                                    const res = await fetch(`${API_BASE}/api/events/upload-image`, {
                                         method: 'POST',
                                         headers: { Authorization: `Bearer ${token}` },
                                         body: data
@@ -252,7 +254,7 @@ const CreateEvent = () => {
                                             data.append('image', file);
                                             try {
                                                 const token = await getAccessTokenSilently();
-                                                const res = await fetch('http://localhost:5000/api/events/upload-image', {
+                                                const res = await fetch(`${API_BASE}/api/events/upload-image`, {
                                                     method: 'POST',
                                                     headers: { Authorization: `Bearer ${token}` },
                                                     body: data
