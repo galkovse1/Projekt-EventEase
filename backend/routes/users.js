@@ -123,4 +123,25 @@ router.get('/:id', async (req, res) => {
 // Dodaj upload endpoint
 router.post('/upload-image', upload.single('image'), uploadImage);
 
+// Izbriši svoj profil
+router.delete('/profile', async (req, res) => {
+  const auth0Id = req.auth.payload.sub;
+  try {
+    // Izbriši vse dogodke, kjer je ta uporabnik lastnik
+    const { Event } = require('../models/allModels');
+    await Event.destroy({ where: { ownerId: auth0Id } });
+    // Izbriši uporabnika
+    const user = await User.findByPk(auth0Id);
+    if (user) {
+      await user.destroy();
+      return res.status(204).send();
+    } else {
+      return res.status(404).json({ error: 'Uporabnik ne obstaja' });
+    }
+  } catch (error) {
+    console.error('Napaka pri brisanju profila:', error);
+    return res.status(500).json({ error: 'Napaka pri brisanju profila' });
+  }
+});
+
 module.exports = router;

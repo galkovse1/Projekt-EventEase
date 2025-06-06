@@ -39,6 +39,7 @@ const Profile = () => {
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [uploading, setUploading] = useState(false);
     const [dragActive, setDragActive] = useState(false);
+    const [deleteConfirm, setDeleteConfirm] = useState(false);
 
     // Funkcija za razčlenjevanje imena in priimka iz emaila
     function parseNameFromEmail(email: string): { name: string; surname: string } {
@@ -294,6 +295,42 @@ const Profile = () => {
                                 />
                                 <span className="text-base text-gray-900">Želim prejemati obvestila o dogodkih</span>
                             </label>
+                            <label className="flex items-center space-x-2 w-full">
+                                <input
+                                    type="checkbox"
+                                    checked={deleteConfirm}
+                                    onChange={e => setDeleteConfirm(e.target.checked)}
+                                    className="h-5 w-5 text-red-600 border-gray-300 rounded"
+                                />
+                                <span className="text-base text-red-600">Zbriši profil</span>
+                            </label>
+                            {deleteConfirm && (
+                                <button
+                                    type="button"
+                                    className="bg-red-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-red-700 w-full text-lg"
+                                    onClick={async () => {
+                                        if (!window.confirm('Si prepričan, da želiš izbrisati svoj profil? Tega ni mogoče razveljaviti!')) return;
+                                        try {
+                                            const token = await getAccessTokenSilently();
+                                            await fetch(`${apiUrl}/api/users/profile`, {
+                                                method: 'DELETE',
+                                                headers: { Authorization: `Bearer ${token}` }
+                                            });
+                                            window.alert('Profil uspešno izbrisan.');
+                                            // Odjavi uporabnika in preusmeri na home
+                                            if (typeof window !== 'undefined') {
+                                                setTimeout(() => {
+                                                    window.location.href = '/';
+                                                }, 500);
+                                            }
+                                        } catch {
+                                            window.alert('Napaka pri brisanju profila!');
+                                        }
+                                    }}
+                                >
+                                    Potrdi brisanje profila
+                                </button>
+                            )}
                             <button onClick={handleSave} type="button" className="bg-[#363636] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#444] w-full text-lg">Shrani</button>
                         </form>
                     ) : (
