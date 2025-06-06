@@ -5,6 +5,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import slLocale from '@fullcalendar/core/locales/sl';
 import { Helmet } from 'react-helmet-async';
+const apiUrl = import.meta.env.VITE_BACKEND_URL;
 
 interface UserProfile {
     auth0Id: string;
@@ -58,7 +59,7 @@ const Profile = () => {
         const fetchProfile = async () => {
             try {
                 const token = await getAccessTokenSilently();
-                const res = await fetch('http://localhost:5000/api/users/profile', {
+                const res = await fetch(`${apiUrl}/api/users/profile`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 const data = await res.json();
@@ -96,9 +97,9 @@ const Profile = () => {
         const fetchEvents = async () => {
             try {
                 const token = await getAccessTokenSilently();
-                const res = await fetch('http://localhost:5000/api/events', {
+                const res = await fetch(`${apiUrl}/api/events`, {
                     headers: { Authorization: `Bearer ${token}` }
-                });
+                }); 
                 const data = await res.json();
                 setEvents(data);
             } catch {
@@ -123,7 +124,7 @@ const Profile = () => {
     const fetchRegistrations = async () => {
         try {
             const token = await getAccessTokenSilently();
-            const res = await fetch(`http://localhost:5000/api/signups/user/${profile?.auth0Id}`, {
+            const res = await fetch(`${apiUrl}/api/signups/user/${profile?.auth0Id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const data = await res.json(); // npr. ["event1", "event3"]
@@ -136,7 +137,7 @@ const Profile = () => {
     const handleSave = async () => {
         try {
             const token = await getAccessTokenSilently();
-            const res = await fetch('http://localhost:5000/api/users/profile', {
+            const res = await fetch(`${apiUrl}/api/users/profile`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -198,7 +199,7 @@ const Profile = () => {
                                     formData.append('image', file);
                                     try {
                                         const token = await getAccessTokenSilently();
-                                        const res = await fetch('http://localhost:5000/api/users/upload-image', {
+                                        const res = await fetch(`${apiUrl}/api/users/upload-image`, {
                                             method: 'POST',
                                             headers: { Authorization: `Bearer ${token}` },
                                             body: formData
@@ -231,7 +232,7 @@ const Profile = () => {
                                         formData.append('image', file);
                                         try {
                                             const token = await getAccessTokenSilently();
-                                            const res = await fetch('http://localhost:5000/api/users/upload-image', {
+                                            const res = await fetch(`${apiUrl}/api/users/upload-image`, {
                                                 method: 'POST',
                                                 headers: { Authorization: `Bearer ${token}` },
                                                 body: formData
