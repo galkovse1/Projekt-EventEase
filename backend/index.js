@@ -12,7 +12,11 @@ const runReminderJob = require('./reminderScheduler');
 require('./models/associations');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: ['https://projekt-event-ease.vercel.app'],
+  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+  credentials: true
+}));
 app.use(express.json());
 
 const PORT = 5000;
