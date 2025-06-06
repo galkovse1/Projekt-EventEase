@@ -30,7 +30,7 @@ const sendCreationConfirmation = async (to, event) => {
             <p><strong>Opis:</strong> ${event.description || 'Ni opisa.'}</p>
             <p><strong>Lokacija:</strong> ${event.location || 'Ni lokacije.'}</p>
             <br/>
-            <a href="http://localhost:3000/events/${event.id}">Klikni za ogled dogodka</a>
+            <a href="${process.env.FRONTEND_BASE_URL}/events/${event.id}">Klikni za ogled dogodka</a>
         `
     });
 };
@@ -46,7 +46,7 @@ const sendReminderEmail = async (to, event) => {
             <p><strong>Opis:</strong> ${event.description || 'Ni opisa.'}</p>
             <p><strong>Lokacija:</strong> ${event.location || 'Ni lokacije.'}</p>
             <br/>
-            <a href="http://localhost:3000/events/${event.id}">Klikni za ogled dogodka</a>
+            <a href="${process.env.FRONTEND_BASE_URL}/events/${event.id}">Klikni za ogled dogodka</a>
         `
     });
 };
@@ -67,7 +67,7 @@ const sendInviteNotification = async (to, userName, event) => {
             <p><strong>Lokacija:</strong> ${event.location || 'Ni lokacije.'}</p>
             ${deadline}
             <br/>
-            <a href="http://localhost:3000/events/${event.id}">Klikni tukaj za ogled dogodka</a>
+            <a href="${process.env.FRONTEND_BASE_URL}/events/${event.id}">Klikni tukaj za ogled dogodka</a>
         `
     });
 };
