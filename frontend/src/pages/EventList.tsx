@@ -54,7 +54,7 @@ const EventList = () => {
                 if (organizer) queryParams.append('organizer', organizer);
                 if (onlyMine && user) queryParams.append('onlyMine', 'true');
 
-                const response = await fetch(`http://localhost:5000/api/events/visible?${queryParams.toString()}`, {
+                const response = await fetch(`${API_BASE}/api/events/visible?${queryParams.toString()}`, {
                     headers: token ? { Authorization: `Bearer ${token}` } : {}
                 });
 
