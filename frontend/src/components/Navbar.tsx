@@ -9,7 +9,7 @@ const navLinks = [
   { to: '/events/create', label: 'Ustvari dogodek', icon: <FaPlusSquare /> },
 ];
 
-export const NavbarContext = createContext({ mini: false, setMini: (v: boolean) => {} });
+export const NavbarContext = createContext({ mini: false, setMini: (_: boolean) => {} });
 
 export const NavbarProvider = ({ children }: { children: React.ReactNode }) => {
   const [mini, setMini] = useState(false);

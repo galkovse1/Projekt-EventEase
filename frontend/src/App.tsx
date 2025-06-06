@@ -1,7 +1,7 @@
 import { Auth0Provider } from '@auth0/auth0-react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { auth0Config } from './auth/auth0-config';
-import { NavbarProvider, NavbarContext, Navbar } from './components/Navbar';
+import { NavbarProvider, Navbar } from './components/Navbar';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
 import EventList from './pages/EventList';
@@ -10,7 +10,6 @@ import EventDetails from './pages/EventDetails';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useEffect } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
-import { useContext } from 'react';
 
 function App() {
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
