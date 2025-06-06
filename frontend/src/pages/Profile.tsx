@@ -27,7 +27,7 @@ interface EventData {
 }
 
 const Profile = () => {
-    const { getAccessTokenSilently, isAuthenticated, isLoading, user } = useAuth0();
+    const { getAccessTokenSilently, isAuthenticated, isLoading, user, logout } = useAuth0();
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [form, setForm] = useState({ name: '', surname: '', description: '', picture: '', wantsNotifications: true });
     const [edit, setEdit] = useState(false);
@@ -317,12 +317,7 @@ const Profile = () => {
                                                 headers: { Authorization: `Bearer ${token}` }
                                             });
                                             window.alert('Profil uspešno izbrisan.');
-                                            // Odjavi uporabnika in preusmeri na home
-                                            if (typeof window !== 'undefined') {
-                                                setTimeout(() => {
-                                                    window.location.href = '/';
-                                                }, 500);
-                                            }
+                                            logout({ logoutParams: { returnTo: window.location.origin } });
                                         } catch {
                                             window.alert('Napaka pri brisanju profila!');
                                         }
