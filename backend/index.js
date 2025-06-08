@@ -12,33 +12,42 @@ const runReminderJob = require('./reminderScheduler');
 require('./models/associations');
 
 const app = express();
-app.use(cors({
-  origin: ['https://projekt-event-ease.vercel.app'],
-  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT', 'OPTIONS'],
-  credentials: true
-}));
+
+const corsOptions = {
+    origin: ['https://projekt-event-ease.vercel.app'],
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT', 'OPTIONS'],
+    credentials: true
+};
+
+// 🛡️ Dodano za podporo preflight (OPTIONS) zahtevam
+app.options('*', cors(corsOptions));
+
+// 🚀 Glavni CORS middleware
+app.use(cors(corsOptions));
+
 app.use(express.json());
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 app.get('/', (req, res) => {
-  res.send('Server is running!');
+    res.send('Server is running!');
 });
+
 app.use('/api/events', eventRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/signups', signupRoutes);
 
 sequelize.authenticate()
-  .then(() => {
-    console.log('✅ Povezava z bazo uspešna');
-    return sequelize.sync();// <-- Dodano za posodobitev struktur
-  })
-  .then(() => {
-    app.listen(PORT, () => {
-        setInterval(runReminderJob, 60 * 1000); // ⏱️ Kliči vsakih 60 sekund
-        console.log(`🚀 Server posluša na http://localhost:${PORT}`);
+    .then(() => {
+        console.log('✅ Povezava z bazo uspešna');
+        return sequelize.sync(); // <-- Če hočeš posodobiti strukturo baze
+    })
+    .then(() => {
+        app.listen(PORT, () => {
+            setInterval(runReminderJob, 60 * 1000); // ⏱️ Kliči vsakih 60 sekund
+            console.log(`🚀 Server posluša na http://localhost:${PORT}`);
+        });
+    })
+    .catch(err => {
+        console.error('❌ Napaka pri povezavi ali sinhronizaciji:', err);
     });
-  })
-  .catch(err => {
-    console.error('❌ Napaka pri povezavi ali sinhronizaciji:', err);
-  });
