@@ -14,7 +14,7 @@ require('./models/associations');
 const app = express();
 app.use(cors({
   origin: ['https://projekt-event-ease.vercel.app'],
-  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT', 'OPTIONS'],
   credentials: true
 }));
 app.use(express.json());
