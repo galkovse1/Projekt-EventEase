@@ -46,8 +46,8 @@ const sendCreationConfirmation = async (to, event) => {
     await transporter.sendMail({
         from: process.env.EMAIL_USER,
         to,
-        subject: `Potrdilo o ustvarjanju dogodka: ${event.title}`,
-        html: wrapEmail(`<h2 style="color: #2b7a78;">🎉 Objavljen nov dogodek</h2>`, content)
+        subject: `EventEase: ${event.title}`,
+        html: wrapEmail(`<h2 style="color: #2b7a78;">🎉 Objavljen je bil nov dogodek!</h2>`, content)
     });
 };
 
