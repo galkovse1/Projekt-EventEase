@@ -30,7 +30,7 @@ const sendCreationConfirmation = async (to, event, creator) => {
 
     const content = `
     <p><strong>📅 Datum in ura:</strong> ${
-        (event.dateOptions?.length > 1 || !event.dateTime)
+        (event.dateOptions && event.dateOptions.length > 0 && !event.dateOptions.some(opt => opt.isFinal))
             ? 'Možnost izbire datuma'
             : new Date(event.dateTime).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })
     }</p>
