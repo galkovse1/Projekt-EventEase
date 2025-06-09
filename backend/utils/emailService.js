@@ -31,7 +31,11 @@ const sendCreationConfirmation = async (to, event) => {
     }
 
     const content = `
-    <p><strong>📅 Datum in ura:</strong> ${new Date(event.dateTime).toLocaleString('sl-SI')}</p>
+    <p><strong>📅 Datum in ura:</strong> ${
+        (event.dateOptions?.length > 1 || !event.dateTime)
+            ? 'Možnost izbire datuma'
+            : new Date(event.dateTime).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })
+    }</p>
     <p><strong>📍 Lokacija:</strong> ${event.location || 'Ni lokacije.'}</p>
     <p><strong>📝 Opis:</strong><br>${event.description || 'Ni opisa.'}</p>
     ${event.imageUrl ? `<img src="${event.imageUrl}" alt="Dogodek" style="max-width:100%; border-radius: 8px; margin-top: 15px;" />` : ''}
@@ -52,7 +56,11 @@ const sendCreationConfirmation = async (to, event) => {
 
 const sendReminderEmail = async (to, event) => {
     const content = `
-    <p><strong>📅 Datum in ura:</strong> ${new Date(event.dateTime).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })}</p>
+    <p><strong>📅 Datum in ura:</strong> ${
+        (event.dateOptions?.length > 1 || !event.dateTime)
+            ? 'Možnost izbire datuma'
+            : new Date(event.dateTime).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })
+    }</p>
     <p><strong>📍 Lokacija:</strong> ${event.location || 'Ni lokacije.'}</p>
     <p><strong>📝 Opis:</strong><br>${event.description || 'Ni opisa.'}</p>
     <p style="margin-top: 20px;">
@@ -78,7 +86,11 @@ const sendInviteNotification = async (to, userName, event) => {
     const content = `
     <p>Pozdravljeni ${userName},</p>
     <p>Bili ste povabljeni na dogodek <strong>${event.title}</strong>.</p>
-    <p><strong>📅 Datum in ura:</strong> ${new Date(event.dateTime).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })}</p>
+    <p><strong>📅 Datum in ura:</strong> ${
+        (event.dateOptions?.length > 1 || !event.dateTime)
+            ? 'Možnost izbire datuma'
+            : new Date(event.dateTime).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })
+    }</p>
     <p><strong>📍 Lokacija:</strong> ${event.location || 'Ni lokacije.'}</p>
     <p><strong>📝 Opis:</strong><br>${event.description || 'Ni opisa.'}</p>
     ${deadline}
