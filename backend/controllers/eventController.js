@@ -96,7 +96,7 @@ const createEvent = async (req, res) => {
     const newEvent = await Event.create({
       title,
       description,
-      dateTime: Array.isArray(req.body.dates) && req.body.dates.length > 0 ? null : dateTime,
+      dateTime,
       location,
       imageUrl,
       allowSignup,
@@ -105,17 +105,6 @@ const createEvent = async (req, res) => {
       ownerId: auth0Id,
       ...(signupDeadline && signupDeadline !== 'Invalid date' ? { signupDeadline } : {}) // 🛡️ zaščita
     });
-    // 🔄 Če ima uporabnik več datumov (glasovanje), jih shrani
-    if (Array.isArray(req.body.dates) && req.body.dates.length > 0) {
-      const options = req.body.dates.map(date => ({
-        eventId: newEvent.id,
-        dateOption: date
-      }));
-      await EventDateOption.bulkCreate(options);
-
-      // ⛔ Izbriši fiksni datum, ker bo izbran pozneje
-      await newEvent.update({ dateTime: null });
-    }
 
     // Shrani EventVisibility (če je treba)
     if (visibility === 'selected' && Array.isArray(visibleTo)) {
@@ -151,17 +140,7 @@ const createEvent = async (req, res) => {
     if (user.email) {
       console.log(`📧 Pošiljam potrditveni email na ${user.email} ...`);
       try {
-        const fullEvent = await Event.findByPk(newEvent.id, {
-          include: [
-            {
-              model: EventDateOption,
-              as: 'dateOptions',
-              attributes: ['id', 'dateOption', 'isFinal'] // 🔥 ključno!
-            },
-            { model: User, as: 'User' }
-          ]
-        });
-        await sendCreationConfirmation(user.email, fullEvent, user);
+        await sendCreationConfirmation(user.email, newEvent);
         console.log(`✅ Email poslan.`);
       } catch (emailErr) {
         console.error(`❌ Napaka pri pošiljanju potrditve:`, emailErr);
