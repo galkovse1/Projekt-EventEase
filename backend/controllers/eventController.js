@@ -96,7 +96,7 @@ const createEvent = async (req, res) => {
     const newEvent = await Event.create({
       title,
       description,
-      dateTime,
+      dateTime: Array.isArray(req.body.dates) && req.body.dates.length > 0 ? null : dateTime,
       location,
       imageUrl,
       allowSignup,
