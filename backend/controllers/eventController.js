@@ -266,8 +266,10 @@ const getVisibleEvents = async (req, res) => {
 
     if (organizer) {
       filters.push({
-        '$User.name$': { [Op.like]: `%${organizer}%` },
-        '$User.surname$': { [Op.like]: `%${organizer}%` }
+        [Op.or]: [
+          { '$User.name$': { [Op.like]: `%${organizer}%` } },
+          { '$User.surname$': { [Op.like]: `%${organizer}%` } }
+        ]
       });
     }
 

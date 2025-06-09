@@ -60,7 +60,12 @@ const EventList = () => {
                 });
 
                 const data = await response.json();
-                setEvents(data);
+                if (Array.isArray(data)) {
+                    setEvents(data);
+                } else {
+                    setEvents([]);
+                    console.error('Napaka: Backend ni vrnil array:', data);
+                }
             } catch (error) {
                 console.error('Napaka pri pridobivanju dogodkov:', error);
             } finally {
