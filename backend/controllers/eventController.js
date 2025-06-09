@@ -105,6 +105,17 @@ const createEvent = async (req, res) => {
       ownerId: auth0Id,
       ...(signupDeadline && signupDeadline !== 'Invalid date' ? { signupDeadline } : {}) // 🛡️ zaščita
     });
+    // 🔄 Če ima uporabnik več datumov (glasovanje), jih shrani
+    if (Array.isArray(req.body.dates) && req.body.dates.length > 0) {
+      const options = req.body.dates.map(date => ({
+        eventId: newEvent.id,
+        dateOption: date
+      }));
+      await EventDateOption.bulkCreate(options);
+
+      // ⛔ Izbriši fiksni datum, ker bo izbran pozneje
+      await newEvent.update({ dateTime: null });
+    }
 
     // Shrani EventVisibility (če je treba)
     if (visibility === 'selected' && Array.isArray(visibleTo)) {
