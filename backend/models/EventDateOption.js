@@ -27,8 +27,9 @@ const EventDateOption = sequelize.define('EventDateOption', {
     }
 });
 
-// Določi povezavo
-EventDateOption.belongsTo(Event, { foreignKey: 'eventId' });
-Event.hasMany(EventDateOption, { foreignKey: 'eventId' });
+if (process.env.NODE_ENV !== 'test') {
+    EventDateOption.belongsTo(Event, { foreignKey: 'eventId' });
+    Event.hasMany(EventDateOption, { foreignKey: 'eventId' });
+}
 
 module.exports = EventDateOption;
