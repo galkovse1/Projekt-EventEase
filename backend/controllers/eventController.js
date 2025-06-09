@@ -153,7 +153,11 @@ const createEvent = async (req, res) => {
       try {
         const fullEvent = await Event.findByPk(newEvent.id, {
           include: [
-            { model: EventDateOption, as: 'dateOptions' },
+            {
+              model: EventDateOption,
+              as: 'dateOptions',
+              attributes: ['id', 'dateOption', 'isFinal'] // 🔥 ključno!
+            },
             { model: User, as: 'User' }
           ]
         });
