@@ -45,6 +45,13 @@ interface Signup {
     userId?: string;
 }
 
+// Funkcija za pretvorbo UTC v lokalni čas za <input type="datetime-local" />
+function formatLocalForInput(utcString: string) {
+    const date = new Date(utcString);
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
 const EventDetails = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -426,7 +433,7 @@ const EventDetails = () => {
                                 type="datetime-local"
                                 name="dateTime"
                                 id="dateTime"
-                                value={editData?.dateTime?.slice(0, 16) || ''}
+                                value={editData?.dateTime ? formatLocalForInput(editData.dateTime) : ''}
                                 onChange={handleEditChange}
                                 className="w-full border rounded-lg p-3 text-lg"
                             />
@@ -437,10 +444,10 @@ const EventDetails = () => {
                                 <input
                                     type="datetime-local"
                                     name="signupDeadline"
-                                    value={editData?.signupDeadline ? editData.signupDeadline.slice(0, 16) : ''}
+                                    value={editData?.signupDeadline ? formatLocalForInput(editData.signupDeadline) : ''}
                                     onChange={handleEditChange}
                                     className="w-full border rounded-lg p-3 text-lg"
-                                    max={editData?.dateTime ? editData.dateTime.slice(0, 16) : undefined}
+                                    max={editData?.dateTime ? formatLocalForInput(editData.dateTime) : undefined}
                                 />
                             </div>
                         )}
