@@ -22,9 +22,7 @@ const wrapEmail = (title, content) => `
   </div>
 `;
 
-const sendCreationConfirmation = async (to, event) => {
-    const creator = await User.findByPk(event.ownerId);
-
+const sendCreationConfirmation = async (to, event, creator) => {
     if (!creator || !creator.wantsNotifications) {
         console.log(`⏩ Uporabnik ${event.ownerId} ne želi prejeti potrditve dogodka.`);
         return;

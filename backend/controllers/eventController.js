@@ -152,9 +152,12 @@ const createEvent = async (req, res) => {
       console.log(`📧 Pošiljam potrditveni email na ${user.email} ...`);
       try {
         const fullEvent = await Event.findByPk(newEvent.id, {
-          include: [{ model: EventDateOption, as: 'dateOptions' }]
+          include: [
+            { model: EventDateOption, as: 'dateOptions' },
+            { model: User, as: 'User' }
+          ]
         });
-        await sendCreationConfirmation(user.email, fullEvent);
+        await sendCreationConfirmation(user.email, fullEvent, user);
         console.log(`✅ Email poslan.`);
       } catch (emailErr) {
         console.error(`❌ Napaka pri pošiljanju potrditve:`, emailErr);
