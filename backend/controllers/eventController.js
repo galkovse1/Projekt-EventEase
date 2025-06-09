@@ -265,13 +265,12 @@ const getVisibleEvents = async (req, res) => {
     }
 
     if (organizer) {
-      filters.push(Sequelize.literal(`
-        EXISTS (
-          SELECT 1 FROM Users
-          WHERE Users.auth0Id = Event.ownerId
-          AND (Users.name LIKE '%${organizer}%' OR Users.surname LIKE '%${organizer}%')
-        )
-      `));
+      filters.push({
+        [Op.or]: [
+          { '$User.name$': { [Op.like]: `%${organizer}%` } },
+          { '$User.surname$': { [Op.like]: `%${organizer}%` } }
+        ]
+      });
     }
 
     if (onlyMine === 'true' && auth0Id) {
