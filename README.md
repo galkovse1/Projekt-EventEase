@@ -99,6 +99,7 @@ npm run dev
      npm install node-cron # 2025-06-04
      npm install nodemailer # 2025-06-04
      npm install axios # 2025-06-04
+     npm install --save-dev jest #Za unit teste
      ```
 
 2. **Frontend ne deluje:**
