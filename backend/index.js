@@ -12,27 +12,18 @@ const runReminderJob = require('./reminderScheduler');
 require('./models/associations');
 
 const app = express();
-
-const corsOptions = {
+app.use(cors({
     origin: ['https://projekt-event-ease.vercel.app'],
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT', 'OPTIONS'],
     credentials: true
-};
-
-// 🛡️ Dodano za podporo preflight (OPTIONS) zahtevam
-app.options('*', cors(corsOptions));
-
-// 🚀 Glavni CORS middleware
-app.use(cors(corsOptions));
-
+}));
 app.use(express.json());
 
-const PORT = process.env.PORT || 5000;
+const PORT = 5000;
 
 app.get('/', (req, res) => {
     res.send('Server is running!');
 });
-
 app.use('/api/events', eventRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/signups', signupRoutes);
@@ -40,7 +31,7 @@ app.use('/api/signups', signupRoutes);
 sequelize.authenticate()
     .then(() => {
         console.log('✅ Povezava z bazo uspešna');
-        return sequelize.sync(); // <-- Če hočeš posodobiti strukturo baze
+        return sequelize.sync();// <-- Dodano za posodobitev struktur
     })
     .then(() => {
         app.listen(PORT, () => {
