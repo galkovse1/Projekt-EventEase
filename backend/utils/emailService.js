@@ -52,7 +52,7 @@ const sendCreationConfirmation = async (to, event) => {
 
 const sendReminderEmail = async (to, event) => {
     const content = `
-    <p><strong>📅 Datum in ura:</strong> ${new Date(event.dateTime).toLocaleString('sl-SI')}</p>
+    <p><strong>📅 Datum in ura:</strong> ${new Date(event.dateTime).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })}</p>
     <p><strong>📍 Lokacija:</strong> ${event.location || 'Ni lokacije.'}</p>
     <p><strong>📝 Opis:</strong><br>${event.description || 'Ni opisa.'}</p>
     <p style="margin-top: 20px;">
@@ -72,13 +72,13 @@ const sendReminderEmail = async (to, event) => {
 
 const sendInviteNotification = async (to, userName, event) => {
     const deadline = event.signupDeadline
-        ? `<p><strong>🗓 Rok za prijavo:</strong> ${new Date(event.signupDeadline).toLocaleString('sl-SI')}</p>`
+        ? `<p><strong>🗓 Rok za prijavo:</strong> ${new Date(event.signupDeadline).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })}</p>`
         : `<p><em>Rok za prijavo ni določen.</em></p>`;
 
     const content = `
     <p>Pozdravljeni ${userName},</p>
     <p>Bili ste povabljeni na dogodek <strong>${event.title}</strong>.</p>
-    <p><strong>📅 Datum in ura:</strong> ${new Date(event.dateTime).toLocaleString('sl-SI')}</p>
+    <p><strong>📅 Datum in ura:</strong> ${new Date(event.dateTime).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })}</p>
     <p><strong>📍 Lokacija:</strong> ${event.location || 'Ni lokacije.'}</p>
     <p><strong>📝 Opis:</strong><br>${event.description || 'Ni opisa.'}</p>
     ${deadline}
