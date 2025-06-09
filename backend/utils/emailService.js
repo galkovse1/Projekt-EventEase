@@ -30,7 +30,7 @@ const sendCreationConfirmation = async (to, event, creator) => {
 
     const content = `
     <p><strong>📅 Datum in ura:</strong> ${
-        (event.dateOptions?.length > 1 || !event.dateTime)
+        (event.dateOptions?.length > 0 && !event.dateOptions.some(opt => opt.isFinal))
             ? 'Možnost izbire datuma'
             : new Date(event.dateTime).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })
     }</p>
@@ -55,7 +55,7 @@ const sendCreationConfirmation = async (to, event, creator) => {
 const sendReminderEmail = async (to, event) => {
     const content = `
     <p><strong>📅 Datum in ura:</strong> ${
-        (event.dateOptions?.length > 1 || !event.dateTime)
+        (event.dateOptions?.length > 0 && !event.dateOptions.some(opt => opt.isFinal))
             ? 'Možnost izbire datuma'
             : new Date(event.dateTime).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })
     }</p>
@@ -85,7 +85,7 @@ const sendInviteNotification = async (to, userName, event) => {
     <p>Pozdravljeni ${userName},</p>
     <p>Bili ste povabljeni na dogodek <strong>${event.title}</strong>.</p>
     <p><strong>📅 Datum in ura:</strong> ${
-        (event.dateOptions?.length > 1 || !event.dateTime)
+        (event.dateOptions?.length > 0 && !event.dateOptions.some(opt => opt.isFinal))
             ? 'Možnost izbire datuma'
             : new Date(event.dateTime).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })
     }</p>
