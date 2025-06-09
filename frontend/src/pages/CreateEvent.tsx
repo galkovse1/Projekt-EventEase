@@ -136,6 +136,11 @@ const CreateEvent = () => {
                 visibility
             } = formData;
 
+            // Popravek: vedno pretvori lokalni čas v UTC ISO string
+            const dateTimeUTC = dateTime ? new Date(dateTime).toISOString() : '';
+            const multipleDatesUTC = multipleDates.map(d => new Date(d).toISOString());
+            const signupDeadlineUTC = signupDeadline ? new Date(signupDeadline).toISOString() : undefined;
+
             const response = await fetch(`${API_BASE}/api/events`, {
                 method: 'POST',
                 headers: {
@@ -145,14 +150,14 @@ const CreateEvent = () => {
                 body: JSON.stringify({
                     title,
                     description,
-                    dateTime: multiDateMode ? new Date(multipleDates[0]).toISOString() : dateTime,
+                    dateTime: multiDateMode ? multipleDatesUTC[0] : dateTimeUTC,
                     location,
                     imageUrl,
                     allowSignup,
                     maxSignups: maxSignups ? parseInt(maxSignups) : null,
                     visibility,
                     visibleTo: selectedUsers.map(u => u.auth0Id),
-                    signupDeadline: visibility === 'selected' ? signupDeadline : undefined
+                    signupDeadline: visibility === 'selected' ? signupDeadlineUTC : undefined
                 })
             });
 
@@ -163,14 +168,14 @@ const CreateEvent = () => {
             const newEvent = await response.json();
 
             // 🔽 Pošlji možnosti datumov, če je omogočeno glasovanje
-            if (multiDateMode && multipleDates.length > 0) {
+            if (multiDateMode && multipleDatesUTC.length > 0) {
                 await fetch(`${API_BASE}/api/events/${newEvent.id}/date-options`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${token}`
                     },
-                    body: JSON.stringify({ dates: multipleDates })
+                    body: JSON.stringify({ dates: multipleDatesUTC })
                 });
             }
 
