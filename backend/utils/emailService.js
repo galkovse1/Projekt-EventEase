@@ -30,8 +30,18 @@ const sendCreationConfirmation = async (to, event) => {
         return;
     }
 
+    let dateInfo = '';
+    if (event.dateOptions && event.dateOptions.length > 1 && !event.dateOptions.some(opt => opt.isFinal)) {
+        dateInfo = '<strong>📅 Datum:</strong> Možnost izbire';
+    } else {
+        const dateToShow = event.dateOptions && event.dateOptions.length > 0 && event.dateOptions.some(opt => opt.isFinal)
+            ? event.dateOptions.find(opt => opt.isFinal).dateOption
+            : event.dateTime;
+        dateInfo = `<strong>📅 Datum in ura:</strong> ${new Date(dateToShow).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })}`;
+    }
+
     const content = `
-    <p><strong>📅 Datum in ura:</strong> ${new Date(event.dateTime).toLocaleString('sl-SI')}</p>
+    <p>${dateInfo}</p>
     <p><strong>📍 Lokacija:</strong> ${event.location || 'Ni lokacije.'}</p>
     <p><strong>📝 Opis:</strong><br>${event.description || 'Ni opisa.'}</p>
     ${event.imageUrl ? `<img src="${event.imageUrl}" alt="Dogodek" style="max-width:100%; border-radius: 8px; margin-top: 15px;" />` : ''}
@@ -105,7 +115,7 @@ const sendSignupConfirmation = async (to, event) => {
 
     let dateInfo = '';
     if (event.dateOptions && event.dateOptions.length > 1 && !event.dateOptions.some(opt => opt.isFinal)) {
-        dateInfo = '<strong>📅 Datum:</strong> Možnost izbiranja datuma';
+        dateInfo = '<strong>📅 Datum:</strong> Možnost izbire';
     } else {
         const dateToShow = event.dateOptions && event.dateOptions.length > 0 && event.dateOptions.some(opt => opt.isFinal)
             ? event.dateOptions.find(opt => opt.isFinal).dateOption
