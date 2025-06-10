@@ -1,12 +1,12 @@
-const { sendReminderEmail, sendInviteNotification } = require('../utils/emailService');
+const { sendReminderEmail, sendInviteNotification, sendCreationConfirmation, sendFinalDateNotification } = require('../utils/emailService');
 const { Op, Sequelize } = require('sequelize');
 const Event = require('../models/Event');
 const User = require('../models/User');
 const EventVisibility = require('../models/EventVisibility');
-const { sendCreationConfirmation } = require('../utils/emailService');
 const EventDateOption = require('../models/EventDateOption');
 const DateVote = require('../models/DateVote');
 const axios = require('axios');
+const EventSignup = require('../models/EventSignup');
 
 
 const getAllEvents = async (req, res) => {
@@ -367,6 +367,18 @@ const setFinalDate = async (req, res) => {
   const selectedOption = await EventDateOption.findByPk(dateOptionId);
   event.dateTime = selectedOption.dateOption;
   await event.save();
+
+  // Pošlji email vsem prijavljenim
+  const signups = await EventSignup.findAll({ where: { eventId } });
+  for (const signup of signups) {
+    if (signup.email) {
+      try {
+        await sendFinalDateNotification(signup.email, event, selectedOption.dateOption);
+      } catch (err) {
+        console.error('Napaka pri pošiljanju obvestila o končnem terminu:', err);
+      }
+    }
+  }
 
   res.json({ message: 'Končni datum izbran' });
 };

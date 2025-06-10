@@ -95,8 +95,8 @@ const EventDetails = () => {
     useEffect(() => {
         if (showSignupForm && user) {
             setSignupData({
-                name: user.given_name || user.name?.split(' ')[0] || '',
-                surname: user.family_name || user.name?.split(' ')[1] || '',
+                name: '',
+                surname: '',
                 age: '',
                 email: user.email || ''
             });

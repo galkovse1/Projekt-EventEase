@@ -147,10 +147,36 @@ const sendCancellationConfirmation = async (to, event) => {
     });
 };
 
+const sendFinalDateNotification = async (to, event, finalDate) => {
+    const deadline = event.signupDeadline
+        ? `<p><strong>🗓 Zadnji rok za prijavo:</strong> ${new Date(event.signupDeadline).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })}</p>`
+        : '';
+    const content = `
+    <p>Organizator je določil končni termin za dogodek <strong>${event.title}</strong>.</p>
+    <p><strong>📅 Izbrani termin:</strong> ${new Date(finalDate).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })}</p>
+    <p><strong>📍 Lokacija:</strong> ${event.location || 'Ni lokacije.'}</p>
+    <p><strong>📝 Opis:</strong><br>${event.description || 'Ni opisa.'}</p>
+    ${deadline}
+    ${event.imageUrl ? `<img src="${event.imageUrl}" alt="Dogodek" style="max-width:100%; border-radius: 8px; margin-top: 15px;" />` : ''}
+    <p style="margin-top: 20px;">
+      <a href="${process.env.FRONTEND_BASE_URL}/events/${event.id}" style="
+        background-color: #2b7a78; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;
+      ">🔗 Ogled dogodka</a>
+    </p>
+  `;
+    await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to,
+        subject: `📢 Končni termin dogodka: ${event.title}`,
+        html: wrapEmail('📢 Določen je končni termin dogodka', content)
+    });
+};
+
 module.exports = {
     sendCreationConfirmation,
     sendReminderEmail,
     sendInviteNotification,
     sendSignupConfirmation,
-    sendCancellationConfirmation
+    sendCancellationConfirmation,
+    sendFinalDateNotification
 };
