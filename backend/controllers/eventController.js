@@ -383,26 +383,6 @@ const deleteVoteForDate = async (req, res) => {
   res.json({ message: 'Glas izbrisan' });
 };
 
-// Dodaj uporabnika med izbrane za dogodek (invite link)
-const addUserToEventVisibility = async (req, res) => {
-  try {
-    const auth0Id = req.auth.payload.sub;
-    const eventId = req.params.id;
-    const event = await Event.findByPk(eventId);
-    if (!event) return res.status(404).json({ error: 'Dogodek ne obstaja' });
-    if (event.visibility !== 'selected') return res.status(400).json({ error: 'Dogodek ni omejen na izbrane uporabnike' });
-
-    // Preveri, če je uporabnik že med izbranimi
-    const existing = await EventVisibility.findOne({ where: { EventId: eventId, UserId: auth0Id } });
-    if (existing) return res.json({ message: 'Uporabnik je že med izbranimi' });
-
-    await EventVisibility.create({ EventId: eventId, UserId: auth0Id });
-    res.json({ message: 'Dodan med izbrane uporabnike' });
-  } catch (err) {
-    res.status(500).json({ error: 'Napaka pri dodajanju uporabnika med izbrane' });
-  }
-};
-
 module.exports = {
   getAllEvents,
   getEventById,
@@ -413,6 +393,5 @@ module.exports = {
   createDateOptions,
   voteForDate,
   setFinalDate,
-  deleteVoteForDate,
-  addUserToEventVisibility
+  deleteVoteForDate
 };
