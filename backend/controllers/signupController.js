@@ -2,6 +2,7 @@ const EventSignup = require('../models/EventSignup');
 const Event = require('../models/Event');
 const User = require('../models/User');
 const { Op } = require('sequelize');
+const { sendSignupConfirmation } = require('../utils/emailService');
 
 const signupToEvent = async (req, res) => {
     const { eventId } = req.params;
@@ -54,6 +55,15 @@ const signupToEvent = async (req, res) => {
         userId,
         email: fixedEmail
     });
+
+    // Pošlji potrditveni email
+    try {
+        await sendSignupConfirmation(fixedEmail, event);
+        console.log(`📧 Potrditveni email poslan na: ${fixedEmail}`);
+    } catch (err) {
+        console.error('❌ Napaka pri pošiljanju potrditvenega emaila:', err);
+        // Ne vračamo napake, ker je prijava uspela
+    }
 
     res.status(201).json(newSignup);
 };
