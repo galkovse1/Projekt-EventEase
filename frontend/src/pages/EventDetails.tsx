@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Helmet } from 'react-helmet-async';
@@ -55,6 +55,7 @@ function formatLocalForInput(utcString: string) {
 const EventDetails = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const { user, getAccessTokenSilently, isLoading, loginWithRedirect } = useAuth0();
 
     const [event, setEvent] = useState<Event | null>(null);
@@ -80,6 +81,40 @@ const EventDetails = () => {
         fetchEvent();
         fetchSignups();
     }, [id]);
+
+    // Pending access logika
+    useEffect(() => {
+        if (!event) return;
+        // Če je dogodek za izbrane uporabnike in uporabnik ni med njimi
+        if (event.visibility === 'selected' && user && !(event.VisibleToUsers || []).some(u => u.auth0Id === user.sub)) {
+            // Preveri, če je pending access v localStorage
+            const pending = localStorage.getItem('pendingEventAccess');
+            if (pending === id) {
+                // Pošlji zahtevo na backend, da doda uporabnika med izbrane
+                (async () => {
+                    try {
+                        const token = await getAccessTokenSilently();
+                        await fetch(`${API_BASE}/api/events/${id}/add-user-to-visibility`, {
+                            method: 'POST',
+                            headers: { Authorization: `Bearer ${token}` }
+                        });
+                        localStorage.removeItem('pendingEventAccess');
+                        // Ponovno naloži dogodek
+                        fetchEvent();
+                    } catch {}
+                })();
+            }
+        }
+    }, [event, user, id]);
+
+    // Če ni prijavljen in je dogodek za izbrane, shrani pending access in preusmeri na login
+    useEffect(() => {
+        if (!event) return;
+        if (event.visibility === 'selected' && !user) {
+            localStorage.setItem('pendingEventAccess', id || '');
+            loginWithRedirect({ appState: { returnTo: location.pathname } });
+        }
+    }, [event, user, id, loginWithRedirect, location.pathname]);
 
     useEffect(() => {
         document.title = event ? `Dogodek: ${event.title} | EventEase` : 'Dogodek | EventEase';

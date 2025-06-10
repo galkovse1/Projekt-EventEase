@@ -9,7 +9,8 @@ const {
   getVisibleEvents,
   createDateOptions,
   voteForDate,
-  setFinalDate
+  setFinalDate,
+  addUserToEventVisibility
 } = require('../controllers/eventController');
 const checkJwt = require('../middleware/auth');
 const { upload, uploadImage } = require('../controllers/uploadController');
@@ -32,5 +33,7 @@ router.post('/:eventId/final-date/:dateOptionId', setFinalDate); // organizator 
 router.delete('/vote/:dateOptionId', require('../controllers/eventController').deleteVoteForDate);
 
 router.post('/upload-image', upload.single('image'), uploadImage);
+
+router.post('/:id/add-user-to-visibility', addUserToEventVisibility);
 
 module.exports = router;
