@@ -43,6 +43,7 @@ interface Signup {
     surname: string;
     age: number;
     userId?: string;
+    email?: string;
 }
 
 // Funkcija za pretvorbo UTC v lokalni čas za <input type="datetime-local" />
@@ -64,7 +65,7 @@ const EventDetails = () => {
     const [signupError, setSignupError] = useState('');
     const [signupSuccess, setSignupSuccess] = useState('');
     const [showSignupForm, setShowSignupForm] = useState(false);
-    const [signupData, setSignupData] = useState({ name: '', surname: '', age: '' });
+    const [signupData, setSignupData] = useState({ name: '', surname: '', age: '', email: '' });
 
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState<Event | null>(null);
@@ -90,6 +91,22 @@ const EventDetails = () => {
             setSelectedUsers(editData.VisibleToUsers || []);
         }
     }, [isEditing, editData]);
+
+    useEffect(() => {
+        if (showSignupForm && user) {
+            setSignupData({
+                name: user.given_name || user.name?.split(' ')[0] || '',
+                surname: user.family_name || user.name?.split(' ')[1] || '',
+                age: '',
+                email: user.email || ''
+            });
+        }
+        if (!showSignupForm) {
+            setSignupError('');
+            setSignupSuccess('');
+        }
+    // eslint-disable-next-line
+    }, [showSignupForm, user]);
 
     const fetchEvent = async () => {
         try {
@@ -293,7 +310,7 @@ const EventDetails = () => {
 
             setSignupSuccess('Uspešno prijavljen!');
             setShowSignupForm(false);
-            setSignupData({ name: '', surname: '', age: '' });
+            setSignupData({ name: '', surname: '', age: '', email: '' });
             fetchSignups();
         } catch {
             setSignupError('Napaka pri prijavi');
@@ -525,6 +542,7 @@ const EventDetails = () => {
                             <form onSubmit={handleSignupSubmit} className="space-y-4 mb-6">
                                 <input type="text" name="name" value={signupData.name} onChange={handleSignupChange} placeholder="Ime" className="w-full border rounded-lg p-3 text-lg" />
                                 <input type="text" name="surname" value={signupData.surname} onChange={handleSignupChange} placeholder="Priimek" className="w-full border rounded-lg p-3 text-lg" />
+                                <input type="email" name="email" value={signupData.email} readOnly placeholder="Email" className="w-full border rounded-lg p-3 text-lg bg-gray-200" />
                                 <input type="number" name="age" value={signupData.age} onChange={handleSignupChange} placeholder="Starost" className="w-full border rounded-lg p-3 text-lg" />
                                 {signupError && <div className="text-red-600 text-center">{signupError}</div>}
                                 {signupSuccess && <div className="text-green-600 text-center">{signupSuccess}</div>}
@@ -545,7 +563,7 @@ const EventDetails = () => {
                                 <ul className="list-disc pl-5">
                                     {signups.map(s => (
                                         <li key={s.id} className="text-gray-900 flex items-center justify-between py-1">
-                                            <span>{s.name} {s.surname} ({s.age} let)</span>
+                                            <span>{s.name} {s.surname} ({s.age} let){s.email ? ` | ${s.email}` : ''}</span>
                                             <button
                                                 onClick={() => handleOwnerRemoveSignup(s.userId)}
                                                 className="ml-2 text-red-600 hover:underline text-sm"
