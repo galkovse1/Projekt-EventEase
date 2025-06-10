@@ -125,9 +125,32 @@ const sendSignupConfirmation = async (to, event) => {
     });
 };
 
+const sendCancellationConfirmation = async (to, event) => {
+    const content = `
+    <p>Uspešno ste se odjavili z dogodka <strong>${event.title}</strong>.</p>
+    <p><strong>📅 Datum in ura:</strong> ${new Date(event.dateTime).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })}</p>
+    <p><strong>📍 Lokacija:</strong> ${event.location || 'Ni lokacije.'}</p>
+    <p><strong>📝 Opis:</strong><br>${event.description || 'Ni opisa.'}</p>
+    ${event.imageUrl ? `<img src="${event.imageUrl}" alt="Dogodek" style="max-width:100%; border-radius: 8px; margin-top: 15px;" />` : ''}
+    <p style="margin-top: 20px;">
+      <a href="${process.env.FRONTEND_BASE_URL}/events/${event.id}" style="
+        background-color: #2b7a78; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;
+      ">🔗 Ogled dogodka</a>
+    </p>
+  `;
+
+    await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to,
+        subject: `❌ Potrdilo odjave z dogodka: ${event.title}`,
+        html: wrapEmail('❌ Uspešna odjava z dogodka', content)
+    });
+};
+
 module.exports = {
     sendCreationConfirmation,
     sendReminderEmail,
     sendInviteNotification,
-    sendSignupConfirmation
+    sendSignupConfirmation,
+    sendCancellationConfirmation
 };

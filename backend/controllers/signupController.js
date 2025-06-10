@@ -2,7 +2,7 @@ const EventSignup = require('../models/EventSignup');
 const Event = require('../models/Event');
 const User = require('../models/User');
 const { Op } = require('sequelize');
-const { sendSignupConfirmation } = require('../utils/emailService');
+const { sendSignupConfirmation, sendCancellationConfirmation } = require('../utils/emailService');
 
 const signupToEvent = async (req, res) => {
     const { eventId } = req.params;
@@ -84,7 +84,25 @@ const cancelSignup = async (req, res) => {
     if (!prijava) {
         return res.status(404).json({ error: 'Prijava ni najdena' });
     }
+
+    // Pridobi podatke o dogodku in uporabniku pred brisanjem prijave
+    const event = await Event.findByPk(eventId);
+    const user = await User.findByPk(userId);
+    const email = prijava.email || (user ? user.email : null);
+
     await prijava.destroy();
+
+    // Pošlji potrditveni email o odjavi
+    if (email && event) {
+        try {
+            await sendCancellationConfirmation(email, event);
+            console.log(`📧 Potrditveni email o odjavi poslan na: ${email}`);
+        } catch (err) {
+            console.error('❌ Napaka pri pošiljanju potrditvenega emaila o odjavi:', err);
+            // Ne vračamo napake, ker je odjava uspela
+        }
+    }
+
     res.status(204).send();
 };
 
