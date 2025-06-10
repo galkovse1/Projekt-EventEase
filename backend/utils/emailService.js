@@ -33,11 +33,11 @@ const sendCreationConfirmation = async (to, event) => {
     let dateInfo = '';
     if (event.dateOptions && event.dateOptions.length > 1 && !event.dateOptions.some(opt => opt.isFinal)) {
         dateInfo = '<strong>📅 Datum:</strong> Možnost izbire';
-    } else {
-        const dateToShow = event.dateOptions && event.dateOptions.length > 0 && event.dateOptions.some(opt => opt.isFinal)
-            ? event.dateOptions.find(opt => opt.isFinal).dateOption
-            : event.dateTime;
+    } else if (event.dateOptions && event.dateOptions.length > 0 && event.dateOptions.some(opt => opt.isFinal)) {
+        const dateToShow = event.dateOptions.find(opt => opt.isFinal).dateOption;
         dateInfo = `<strong>📅 Datum in ura:</strong> ${new Date(dateToShow).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })}`;
+    } else {
+        dateInfo = `<strong>📅 Datum in ura:</strong> Ni določen.`;
     }
 
     const content = `
@@ -116,11 +116,11 @@ const sendSignupConfirmation = async (to, event) => {
     let dateInfo = '';
     if (event.dateOptions && event.dateOptions.length > 1 && !event.dateOptions.some(opt => opt.isFinal)) {
         dateInfo = '<strong>📅 Datum:</strong> Možnost izbire';
-    } else {
-        const dateToShow = event.dateOptions && event.dateOptions.length > 0 && event.dateOptions.some(opt => opt.isFinal)
-            ? event.dateOptions.find(opt => opt.isFinal).dateOption
-            : event.dateTime;
+    } else if (event.dateOptions && event.dateOptions.length > 0 && event.dateOptions.some(opt => opt.isFinal)) {
+        const dateToShow = event.dateOptions.find(opt => opt.isFinal).dateOption;
         dateInfo = `<strong>📅 Datum in ura:</strong> ${new Date(dateToShow).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })}`;
+    } else {
+        dateInfo = `<strong>📅 Datum in ura:</strong> Ni določen.`;
     }
 
     const content = `
