@@ -30,20 +30,8 @@ const sendCreationConfirmation = async (to, event) => {
         return;
     }
 
-    let dateInfo = '';
-    let choosingInfo = '';
-    if (event.dateOptions && event.dateOptions.length > 1 && !event.dateOptions.some(opt => opt.isFinal)) {
-        choosingInfo = '<em>Trenutno poteka izbira termina. Končni termin bo določen po glasovanju.</em>';
-    } else if (event.dateOptions && event.dateOptions.length > 0 && event.dateOptions.some(opt => opt.isFinal)) {
-        const dateToShow = event.dateOptions.find(opt => opt.isFinal).dateOption;
-        dateInfo = `<strong>📅 Datum in ura:</strong> ${new Date(dateToShow).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })}`;
-    } else {
-        dateInfo = `<strong>📅 Datum in ura:</strong> Ni določen.`;
-    }
-
     const content = `
-    ${dateInfo ? `<p>${dateInfo}</p>` : ''}
-    ${choosingInfo ? `<p>${choosingInfo}</p>` : ''}
+    <p><strong>📅 Datum in ura:</strong> ${new Date(event.dateTime).toLocaleString('sl-SI')}</p>
     <p><strong>📍 Lokacija:</strong> ${event.location || 'Ni lokacije.'}</p>
     <p><strong>📝 Opis:</strong><br>${event.description || 'Ni opisa.'}</p>
     ${event.imageUrl ? `<img src="${event.imageUrl}" alt="Dogodek" style="max-width:100%; border-radius: 8px; margin-top: 15px;" />` : ''}
@@ -115,21 +103,9 @@ const sendSignupConfirmation = async (to, event) => {
         ? `<p><strong>🗓 Rok za prijavo:</strong> ${new Date(event.signupDeadline).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })}</p>`
         : '';
 
-    let dateInfo = '';
-    let choosingInfo = '';
-    if (event.dateOptions && event.dateOptions.length > 1 && !event.dateOptions.some(opt => opt.isFinal)) {
-        choosingInfo = '<em>Trenutno poteka izbira termina. Končni termin bo določen po glasovanju.</em>';
-    } else if (event.dateOptions && event.dateOptions.length > 0 && event.dateOptions.some(opt => opt.isFinal)) {
-        const dateToShow = event.dateOptions.find(opt => opt.isFinal).dateOption;
-        dateInfo = `<strong>📅 Datum in ura:</strong> ${new Date(dateToShow).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })}`;
-    } else {
-        dateInfo = `<strong>📅 Datum in ura:</strong> Ni določen.`;
-    }
-
     const content = `
     <p>Uspešno ste se prijavili na dogodek <strong>${event.title}</strong>.</p>
-    ${dateInfo ? `<p>${dateInfo}</p>` : ''}
-    ${choosingInfo ? `<p>${choosingInfo}</p>` : ''}
+    <p><strong>📅 Datum in ura:</strong> ${new Date(event.dateTime).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })}</p>
     <p><strong>📍 Lokacija:</strong> ${event.location || 'Ni lokacije.'}</p>
     <p><strong>📝 Opis:</strong><br>${event.description || 'Ni opisa.'}</p>
     ${deadline}
