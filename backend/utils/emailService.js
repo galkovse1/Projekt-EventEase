@@ -75,10 +75,18 @@ const sendInviteNotification = async (to, userName, event) => {
         ? `<p><strong>🗓 Rok za prijavo:</strong> ${new Date(event.signupDeadline).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })}</p>`
         : `<p><em>Rok za prijavo ni določen.</em></p>`;
 
+    // Dodano: Prikaz "Izberi datum" ali dejanskega datuma
+    let dateContent = '';
+    if (event.dateOptions && event.dateOptions.length > 0) {
+        dateContent = `<a href="${process.env.FRONTEND_BASE_URL}/events/${event.id}" style="color:#2563eb;font-weight:bold;">Izberi datum</a>`;
+    } else {
+        dateContent = new Date(event.dateTime).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' });
+    }
+
     const content = `
     <p>Pozdravljeni ${userName},</p>
     <p>Bili ste povabljeni na dogodek <strong>${event.title}</strong>.</p>
-    <p><strong>📅 Datum in ura:</strong> ${new Date(event.dateTime).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })}</p>
+    <p><strong>📅 Datum in ura:</strong> ${dateContent}</p>
     <p><strong>📍 Lokacija:</strong> ${event.location || 'Ni lokacije.'}</p>
     <p><strong>📝 Opis:</strong><br>${event.description || 'Ni opisa.'}</p>
     ${deadline}
