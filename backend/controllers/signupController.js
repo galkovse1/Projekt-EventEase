@@ -8,7 +8,10 @@ const signupToEvent = async (req, res) => {
     const { eventId } = req.params;
     const { name, surname, age, userId, email } = req.body;
 
-    const event = await Event.findByPk(eventId);
+    // Pridobi dogodek z možnimi datumi
+    const event = await Event.findByPk(eventId, {
+        include: [{ model: require('../models/EventDateOption'), as: 'dateOptions' }]
+    });
     if (!event || !event.allowSignup) {
         return res.status(403).json({ error: 'Prijava ni dovoljena' });
     }

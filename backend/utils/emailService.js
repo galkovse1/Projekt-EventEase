@@ -103,9 +103,19 @@ const sendSignupConfirmation = async (to, event) => {
         ? `<p><strong>🗓 Rok za prijavo:</strong> ${new Date(event.signupDeadline).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })}</p>`
         : '';
 
+    let dateInfo = '';
+    if (event.dateOptions && event.dateOptions.length > 1 && !event.dateOptions.some(opt => opt.isFinal)) {
+        dateInfo = '<strong>📅 Datum:</strong> Možnost izbiranja datuma';
+    } else {
+        const dateToShow = event.dateOptions && event.dateOptions.length > 0 && event.dateOptions.some(opt => opt.isFinal)
+            ? event.dateOptions.find(opt => opt.isFinal).dateOption
+            : event.dateTime;
+        dateInfo = `<strong>📅 Datum in ura:</strong> ${new Date(dateToShow).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })}`;
+    }
+
     const content = `
     <p>Uspešno ste se prijavili na dogodek <strong>${event.title}</strong>.</p>
-    <p><strong>📅 Datum in ura:</strong> ${new Date(event.dateTime).toLocaleString('sl-SI', { timeZone: 'Europe/Ljubljana' })}</p>
+    <p>${dateInfo}</p>
     <p><strong>📍 Lokacija:</strong> ${event.location || 'Ni lokacije.'}</p>
     <p><strong>📝 Opis:</strong><br>${event.description || 'Ni opisa.'}</p>
     ${deadline}
