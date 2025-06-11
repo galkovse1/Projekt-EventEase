@@ -125,12 +125,11 @@ git clone https://github.com/galkovse1/Projekt-EventEase
 
 ## Zaslonske maske (Screenshots)
 
-<!-- Dodaj slike v mapo screenshots in jih odkomentiraj -->
-<!--
-![Prijava](screenshots/login.png)
-![Koledar dogodkov](screenshots/calendar.png)
-![Urejanje dogodka](screenshots/edit-event.png)
--->
+
+![Domov stran](screenshots/Domov.png)
+![Prijava](screenshots/Prijava.png)
+![Profil](screenshots/Profil.png)
+![Koledar dogodkov](screenshots/Koledar.png)
 
 ---
 
