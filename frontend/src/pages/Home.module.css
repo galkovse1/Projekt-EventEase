@@ -74,6 +74,8 @@
   border-top-left-radius: 24px;
   border-top-right-radius: 24px;
   display: block;
+  
+  opacity: 0.5;      /* Po želji: še malo prosojnosti */
 }
 
 .cardBgTitle {
