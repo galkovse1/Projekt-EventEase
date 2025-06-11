@@ -1,0 +1,90 @@
+.backgroundTracks {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100vw;
+  height: 480px;
+  z-index: 1;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tracksWrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  width: 100vw;
+  /* height: 480px;  <-- odstrani ali zakomentiraj */
+  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+}
+
+.track {
+  display: flex;
+  flex-direction: column;
+  animation-name: scrollTrack;
+  animation-timing-function: linear; /* Pomembno za gladkost */
+  animation-iteration-count: infinite;
+}
+
+@keyframes scrollTrack {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+.card {
+    width: 160px;
+    height: 160px; /* ali npr. 80px za pravokotnik */
+    overflow: hidden;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    background: #fff;
+    margin: 0 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cardBg {
+  width: 260px;
+  height: 320px;
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.10);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 16px;
+  overflow: hidden;
+  justify-content: flex-start;
+}
+
+.cardBgImage {
+  width: 100%;
+  height: 68%;
+  object-fit: cover;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  display: block;
+}
+
+.cardBgTitle {
+  width: 100%;
+  padding: 18px 12px 0 12px;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #232323;
+  text-align: center;
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
