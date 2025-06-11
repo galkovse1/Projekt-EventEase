@@ -1,9 +1,10 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { Link, useLocation } from 'react-router-dom';
-import { FaCalendarAlt, FaUser, FaPlusSquare, FaSignOutAlt, FaSignInAlt, FaUserPlus, FaBars, FaTimes } from 'react-icons/fa';
+import { FaCalendarAlt, FaUser, FaPlusSquare, FaSignOutAlt, FaSignInAlt, FaUserPlus, FaBars, FaTimes, FaHome } from 'react-icons/fa';
 import { useState, createContext } from 'react';
 
 const navLinks = [
+  { to: '/', label: 'Domov', icon: <FaHome /> }, 
   { to: '/events', label: 'Dogodki', icon: <FaCalendarAlt /> },
   { to: '/profile', label: 'Profil', icon: <FaUser /> },
   { to: '/events/create', label: 'Ustvari dogodek', icon: <FaPlusSquare /> },
