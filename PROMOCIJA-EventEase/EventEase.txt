@@ -1,0 +1,19 @@
+Ime Projekta: EventEase
+
+Kratek plot: Moderna spletna aplikacija za enostavno organizacijo in upravljanje dogodkov, ki poenostavlja proces ustvarjanja, prijav in spremljanja dogodkov z naprednimi funkcionalnostmi kot so e-mail opomniki, koledarski prikaz in napredno filtriranje.
+
+Leto izdelave: 2024
+
+Avtorji:
+Gal Kovše
+Jožef Ivančič
+Chantal Pia Ribič
+
+Domača stran: https://projekt-event-ease.vercel.app
+
+Kategorizacija: spletna aplikacija
+
+Oznake: ReactJS, NodeJS, Express, PostgreSQL, TypeScript, Auth0, TailwindCSS, REST, Cloudinary, Nodemailer, Sequelize, Jest, Render Vercel
+
+Opis projekta:
+EventEase je inovativna spletna aplikacija, namenjena poenostavitvi organizacije in upravljanja dogodkov. Aplikacija ponuja intuitiven vmesnik za ustvarjanje, urejanje in spremljanje dogodkov, pri čemer uporabnikom omogoča enostavno upravljanje s prijavami udeležencev, pošiljanje e-mail opomnikov in napredno filtriranje dogodkov. Posebnost aplikacije je implementacija koledarskega prikaza dogodkov, ki omogoča pregledno vizualizacijo prihajajočih dogodkov na profilu uporabnika. Aplikacija vključuje tudi funkcionalnosti za javne in zasebne dogodke, možnost nalaganja slik, ter sistem za izbiro datuma dogodka preko glasovanja. Zgrajena je z uporabo sodobnega tehnološkega sklada, ki vključuje React in TypeScript za frontend, Node.js in Express za backend, ter PostgreSQL za shranjevanje podatkov. Posebna pozornost je bila namenjena varnosti in zasebnosti uporabnikov, kar je doseženo z implementacijo Auth0 za avtentikacijo.

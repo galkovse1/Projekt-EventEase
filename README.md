@@ -27,7 +27,7 @@
 - **Frontend:** React, TypeScript, TailwindCSS, React Router, Auth0, Axios
 - **Backend:** Node.js, Express, Sequelize (ORM), JWT, Nodemailer, Cloudinary, Multer
 - **Baza podatkov:** PostgreSQL
-- **Ostalo:** Postman (testiranje API-jev), Git, Vercel (deploy frontend), Render/Railway (deploy backend)
+- **Ostalo:** Postman (testiranje API-jev), Git, Render (deploy backend), Vercel (deploy frontend)
 
 ### Ključne knjižnice (ukazi za namestitev)
 
@@ -125,12 +125,10 @@ git clone https://github.com/galkovse1/Projekt-EventEase
 
 ## Zaslonske maske (Screenshots)
 
-<!-- Dodaj slike v mapo screenshots in jih odkomentiraj -->
-<!--
-![Prijava](screenshots/login.png)
-![Koledar dogodkov](screenshots/calendar.png)
-![Urejanje dogodka](screenshots/edit-event.png)
--->
+![Domov stran](screenshots/Domov.png)
+![Prijava](screenshots/Prijava.png)
+![Profil](screenshots/Profil.png)
+![Koledar dogodkov](screenshots/Koledar.png)
 
 ---
 
